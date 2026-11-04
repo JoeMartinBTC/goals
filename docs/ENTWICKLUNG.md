@@ -31,7 +31,7 @@ Swift Package ohne Xcode-Projekt. Das Bundle baut `Scripts/build_local_app.sh`.
 
 ## Prüf-Startmodi
 
-- `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Sichtbarkeit fragt er beim Fensterdienst ab. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Die Sperre ruft er direkt auf, die echten Systemmeldungen laufen nicht mit. Nutzt eine Wegwerf-Datei und Wegwerf-Einstellungen.
+- `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Sichtbarkeit fragt er beim Fensterdienst ab und gibt ihm bis zu zwei Sekunden Zeit, damit eine ausgelastete Maschine kein falsches Rot ergibt. `frontmostUnchanged` wird nur rot, wenn der Selbsttest selbst nach vorn kommt; ein Wechsel zwischen anderen Programmen zählt nicht. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Die Sperre ruft er direkt auf, die echten Systemmeldungen laufen nicht mit. Nutzt eine Wegwerf-Datei und Wegwerf-Einstellungen.
 - `--autostart-status`: nennt den Stand des Anmeldeobjekts.
 - `--snapshot <ordner>`: 24 Bilder der Karten (vier Größen, sechs Farbdarstellungen) und zwei des Einstellungsfensters. Die Karten rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
 - `--show-for <sekunden> [--allow-capture]`: zeigt zwei Prüfkarten und nennt ihr Rechteck. So lässt sich die Aufzeichnungs-Sperre von außen prüfen.
@@ -42,5 +42,7 @@ Swift Package ohne Xcode-Projekt. Das Bundle baut `Scripts/build_local_app.sh`.
 - `.shadow` auf einer Ansicht mit Hintergrund gibt auch jeder Schrift einen Schatten. Davor gehört `.compositingGroup()`.
 - Synthetisiertes `Decodable` ignoriert Standardwerte. `GoalCard` und `GoalFile` haben deshalb eigene Initialisierer mit `decodeIfPresent`.
 - `open(path, O_EVTONLY)` hängt an der Inode. Atomares Speichern ersetzt sie, deshalb öffnet `FileWatcher` bei `.delete` und `.rename` den Pfad neu.
+- Die Prüfmodi laufen ohne `app.run()`. Unter einer schon gelaufenen Bundle-ID ordnet AppKit dann keine Fenster an, obwohl `isVisible` `true` meldet. `main.swift` setzt deshalb für diese Modi `ApplePersistenceIgnoreState`, nur im Prozess. Ein grüner Lauf aus `.build` sagt darüber nichts, denn dort gibt es keine Bundle-ID. Geprüft wird das installierte Paket.
+- Den normalen Betrieb prüft man ohne echte Daten mit einem Wegwerf-Ordner: `CFFIXED_USER_HOME=<ordner> /Applications/Goals.app/Contents/MacOS/Goals -intervalMinutes 1 -displaySeconds 5 -autostartInitialized YES`. Die Karten liegen dann unter `<ordner>/Library/Application Support/Goals/goals.json`. Einstellungen aus diesem Ordner liest die App nicht, deshalb stehen sie als Startargumente im Befehl.
 - Prüfen im Vollbild: Ein Hilfsprogramm geht mit eigenem Fenster per `toggleFullScreen` in den Vollbildmodus und startet dort `--selftest`. Die Prüfung `listedOnCurrentSpace` zeigt dann, ob das Overlay auf dem Vollbild-Space liegt.
 - Ob eine Aufzeichnung die Karten wirklich auslässt, zeigt nur ein echter Versuch: `--show-for 15` starten und ein Bildschirmfoto machen. Das braucht das Recht auf Bildschirmaufnahme.

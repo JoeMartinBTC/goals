@@ -9,6 +9,12 @@ if arguments.contains("--autostart-status") {
     exit(0)
 }
 
+// Die Prüfmodi laufen ohne `app.run()`. Unter einer schon gelaufenen Bundle-ID ordnet AppKit dann keine Fenster an.
+// Der Wert gilt nur für diesen Prozess; der normale Start bleibt unberührt.
+if arguments.contains(where: { ["--selftest", "--snapshot", "--show-for"].contains($0) }) {
+    UserDefaults.standard.register(defaults: ["ApplePersistenceIgnoreState": true])
+}
+
 // `Goals --selftest` prüft den Ablauf im echten Fenster, `Goals --snapshot <ordner>` rendert Bilder.
 if arguments.contains("--selftest") {
     exit(MainActor.assumeIsolated { SelfTest.run() })

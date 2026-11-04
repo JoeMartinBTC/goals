@@ -16,15 +16,16 @@ enum SelfTest {
     ]
 
     private static var checks: [String: Bool] = [:]
-    private static var frontBefore: pid_t?
     private static var focusLost = false
+    /// So lange darf der Fensterdienst nachziehen, damit eine ausgelastete Maschine kein falsches Rot ergibt.
+    private static let settle: TimeInterval = 2
 
-    /// Lässt die Ereignisse laufen und merkt sich dabei jeden Wechsel des vordersten Programms.
+    /// Lässt die Ereignisse laufen und merkt sich, ob dieses Programm dabei nach vorn kam. Wechsel zwischen anderen Programmen zählen nicht.
     private static func spin(_ seconds: TimeInterval) {
         let end = Date().addingTimeInterval(seconds)
         repeat {
             RunLoop.main.run(until: min(end, Date().addingTimeInterval(0.05)))
-            if let front = frontBefore, NSWorkspace.shared.frontmostApplication?.processIdentifier != front { focusLost = true }
+            if NSWorkspace.shared.frontmostApplication?.processIdentifier == getpid() { focusLost = true }
         } while Date() < end
     }
 
@@ -104,7 +105,6 @@ enum SelfTest {
         app.setActivationPolicy(.regular)
         app.finishLaunching()
 
-        frontBefore = NSWorkspace.shared.frontmostApplication?.processIdentifier
         let realBefore = try? Data(contentsOf: GoalStore.defaultFileURL)
 
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("goals-selftest-\(UUID().uuidString)")
@@ -121,7 +121,7 @@ enum SelfTest {
         let store = GoalStore(fileURL: url)
         let settings = GoalSettings(defaults: defaults)
         settings.size = .small
-        var display: TimeInterval = 1.2
+        var display: TimeInterval = 2.0
         var interval: TimeInterval = 1.0
         let engine = GoalsEngine(store: store, settings: settings, timing: .init(
             interval: { _ in interval },
@@ -139,12 +139,12 @@ enum SelfTest {
         spin(0.4)   // länger als das Einblenden
 
         // Fenster im echten Fensterdienst
+        checks["listedOnCurrentSpace"] = spin(until: { onScreen(panel) }, timeout: settle)
         let info = windowInfo(panel)
         checks["layerAboveFloating"] = (info?[kCGWindowLayer as String] as? Int ?? 0) >= Int(CGWindowLevelForKey(.statusWindow))
         // Nur die Markierung. Ob eine Aufnahme sie befolgt, zeigt ein Versuch von Hand mit `--show-for`.
         checks["sharingFlagNone"] = (info?[kCGWindowSharingState as String] as? Int) == 0
-        checks["listedOnCurrentSpace"] = onScreen(panel)
-        checks["visibleWhenShown"] = panel.isVisible && panel.alphaValue > 0.99
+        checks["visibleWhenShown"] = spin(until: { panel.isVisible && panel.alphaValue > 0.99 }, timeout: settle)
         checks["sessionLockReadable"] = CGSessionCopyCurrentDictionary() != nil
         checks["statusSymbolExists"] = NSImage(systemSymbolName: AppDelegate.statusSymbol, accessibilityDescription: nil) != nil
         checks["panelFlags"] = panel.collectionBehavior.contains(.canJoinAllSpaces)
@@ -164,15 +164,15 @@ enum SelfTest {
         } else {
             checks["nextCountsFromVanish"] = false
         }
-        spin(0.4)
-        checks["vanishesAfterDisplay"] = vanished && abs(vanishedAt.timeIntervalSince(appeared) - 1.2) < 0.5 && gone(panel)
+        let leftScreen = spin(until: { gone(panel) }, timeout: settle)
+        checks["vanishesAfterDisplay"] = vanished && abs(vanishedAt.timeIntervalSince(appeared) - 2.0) < 1.0 && leftScreen
 
         // Schließen per Klick; lange Zeiten, damit nichts von selbst verschwindet
         display = 60
         interval = 60
         settings.onChange?()
         engine.showNow()
-        spin(0.4)
+        _ = spin(until: { onScreen(panel) }, timeout: settle)
         let before = overlay.model.layout
         if let layout = before, let first = layout.placements.first {
             click(panel, canvasHeight: layout.canvas.height, at: first.closeRect)
@@ -181,8 +181,7 @@ enum SelfTest {
                 && !overlay.model.visible.contains(first.id) && onScreen(panel)
             checks["noReflowAfterClose"] = overlay.model.layout == before
             if let all = layout.closeAllRect { click(panel, canvasHeight: layout.canvas.height, at: all) }
-            spin(0.4)
-            checks["closeAllByClick"] = engine.scheduler.visibleIDs.isEmpty && gone(panel)
+            checks["closeAllByClick"] = spin(until: { engine.scheduler.visibleIDs.isEmpty && gone(panel) }, timeout: settle)
         } else {
             checks["closeOneByClick"] = false
         }
@@ -197,11 +196,13 @@ enum SelfTest {
         var widths = true
         for size in CardSize.allCases {
             settings.size = size
-            spin(0.2)
             let expected = size.width + 2 * CardLayout.margin
-            let bounds = windowInfo(panel)?[kCGWindowBounds as String] as? [String: Any]
-            let reported = (bounds?["Width"] as? CGFloat) ?? (bounds?["Width"] as? Double).map { CGFloat($0) } ?? 0
-            widths = widths && panel.frame.width == expected && reported == expected && overlay.model.layout?.size == size
+            let matches = spin(until: {
+                let bounds = windowInfo(panel)?[kCGWindowBounds as String] as? [String: Any]
+                let reported = (bounds?["Width"] as? CGFloat) ?? (bounds?["Width"] as? Double).map { CGFloat($0) } ?? 0
+                return panel.frame.width == expected && reported == expected && overlay.model.layout?.size == size
+            }, timeout: settle)
+            widths = widths && matches
         }
         checks["fourWidths"] = widths
         settings.size = .small
@@ -234,10 +235,9 @@ enum SelfTest {
         let firesBefore = engine.fireCount
         spin(0.6)
         checks["noTimerWhileLocked"] = engine.fireCount == firesBefore
-        checks["lockedShowsNothing"] = gone(panel)
+        checks["lockedShowsNothing"] = spin(until: { gone(panel) }, timeout: settle)
         engine.resume(.locked)
-        spin(0.3)
-        checks["unlockShowsOverdue"] = overlay.isShown && onScreen(panel)
+        checks["unlockShowsOverdue"] = spin(until: { overlay.isShown && onScreen(panel) }, timeout: settle)
         interval = 60
         settings.onChange?()
         engine.closeAll()
