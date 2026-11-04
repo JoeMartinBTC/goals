@@ -9,8 +9,9 @@ final class AutoStart: ObservableObject {
 
     func registerOnFirstRun() {
         guard !UserDefaults.standard.bool(forKey: "autostartInitialized") else { return }
-        UserDefaults.standard.set(true, forKey: "autostartInitialized")
         set(true)
+        // Erst nach Erfolg merken, sonst käme ein gescheiterter Eintrag nie wieder dran.
+        if isOn { UserDefaults.standard.set(true, forKey: "autostartInitialized") }
     }
 
     func set(_ on: Bool) {

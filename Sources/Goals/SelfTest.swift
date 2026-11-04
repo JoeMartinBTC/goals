@@ -5,10 +5,37 @@ import GoalsCore
 /// Die Karten erscheinen dabei rund 15 Sekunden lang mehrfach auf dem Bildschirm.
 @MainActor
 enum SelfTest {
-    private static var checks: [String: Bool] = [:]
+    /// Jede Prüfung muss laufen. Fehlt eine im Ergebnis, zählt sie als gescheitert.
+    private static let expected = [
+        "allCardsTogether", "appearsAfterInterval", "brokenFileRecovers", "brokenFileUntouched", "centeredOnMainScreen",
+        "closeAllByClick", "closeOneByClick", "externalInPlace", "externalReplace", "fourWidths", "frontmostUnchanged",
+        "layerAboveFloating", "listedOnCurrentSpace", "lockedShowsNothing", "nextCountsFromVanish", "noReflowAfterClose",
+        "noTimerWhileLocked", "notBeforeInterval", "panelFlags", "positionResetCenters", "positionRestored",
+        "realFileUntouched", "sessionLockReadable", "sharingFlagNone", "singleCardAlone", "statusSymbolExists",
+        "unlockShowsOverdue", "vanishesAfterDisplay", "visibleWhenShown",
+    ]
 
+    private static var checks: [String: Bool] = [:]
+    private static var frontBefore: pid_t?
+    private static var focusLost = false
+
+    /// Lässt die Ereignisse laufen und merkt sich dabei jeden Wechsel des vordersten Programms.
     private static func spin(_ seconds: TimeInterval) {
-        RunLoop.main.run(until: Date().addingTimeInterval(seconds))
+        let end = Date().addingTimeInterval(seconds)
+        repeat {
+            RunLoop.main.run(until: min(end, Date().addingTimeInterval(0.05)))
+            if let front = frontBefore, NSWorkspace.shared.frontmostApplication?.processIdentifier != front { focusLost = true }
+        } while Date() < end
+    }
+
+    /// Fragt den Fensterdienst, nicht den eigenen Zustand: Steht das Fenster gerade auf dem Bildschirm?
+    private static func onScreen(_ panel: NSPanel) -> Bool {
+        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
+        return list.contains { ($0[kCGWindowNumber as String] as? Int) == panel.windowNumber }
+    }
+
+    private static func gone(_ panel: NSPanel) -> Bool {
+        !panel.isVisible && !onScreen(panel)
     }
 
     private static func spin(until condition: () -> Bool, timeout: TimeInterval) -> Bool {
@@ -67,11 +94,17 @@ enum SelfTest {
     }
 
     static func run() -> Int32 {
+        // Bei gesperrtem Bildschirm zeigt Goals absichtlich nichts; das wäre kein Befund.
+        guard !GoalsEngine.sessionIsLocked else {
+            print("{\n  \"ok\": false,\n  \"error\": \"Der Bildschirm ist gesperrt. Der Selbsttest braucht einen entsperrten Bildschirm.\"\n}")
+            return 2
+        }
+
         let app = NSApplication.shared
         app.setActivationPolicy(.regular)
         app.finishLaunching()
 
-        let frontBefore = NSWorkspace.shared.frontmostApplication?.processIdentifier
+        frontBefore = NSWorkspace.shared.frontmostApplication?.processIdentifier
         let realBefore = try? Data(contentsOf: GoalStore.defaultFileURL)
 
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("goals-selftest-\(UUID().uuidString)")
@@ -99,7 +132,7 @@ enum SelfTest {
         // Takt und Anzeigedauer
         engine.start()
         spin(0.6)
-        checks["notBeforeInterval"] = !overlay.isShown
+        checks["notBeforeInterval"] = !overlay.isShown && gone(panel)
         checks["appearsAfterInterval"] = spin(until: { overlay.isShown }, timeout: 1.5)
         let appeared = Date()
         checks["allCardsTogether"] = engine.scheduler.visibleIDs.count == 3 && overlay.model.placedVisibleCount == 3
@@ -108,9 +141,11 @@ enum SelfTest {
         // Fenster im echten Fensterdienst
         let info = windowInfo(panel)
         checks["layerAboveFloating"] = (info?[kCGWindowLayer as String] as? Int ?? 0) >= Int(CGWindowLevelForKey(.statusWindow))
-        checks["sharingBlocked"] = (info?[kCGWindowSharingState as String] as? Int) == 0
-        let onScreen = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
-        checks["listedOnCurrentSpace"] = onScreen.contains { ($0[kCGWindowNumber as String] as? Int) == panel.windowNumber }
+        // Nur die Markierung. Ob eine Aufnahme sie befolgt, entscheidet das Aufnahmeprogramm; das prüft `--show-for`.
+        checks["sharingFlagNone"] = (info?[kCGWindowSharingState as String] as? Int) == 0
+        checks["listedOnCurrentSpace"] = onScreen(panel)
+        checks["visibleWhenShown"] = panel.isVisible && panel.alphaValue > 0.99
+        checks["sessionLockReadable"] = CGSessionCopyCurrentDictionary() != nil
         checks["statusSymbolExists"] = NSImage(systemSymbolName: AppDelegate.statusSymbol, accessibilityDescription: nil) != nil
         checks["panelFlags"] = panel.collectionBehavior.contains(.canJoinAllSpaces)
             && panel.collectionBehavior.contains(.fullScreenAuxiliary)
@@ -123,13 +158,14 @@ enum SelfTest {
         }
 
         let vanished = spin(until: { !overlay.isShown }, timeout: 3)
-        let gone = Date()
-        checks["vanishesAfterDisplay"] = vanished && abs(gone.timeIntervalSince(appeared) - 1.2) < 0.5
+        let vanishedAt = Date()
         if case .waiting(let until) = engine.scheduler.phase {
-            checks["nextCountsFromVanish"] = abs(until.timeIntervalSince(gone) - 1.0) < 0.4
+            checks["nextCountsFromVanish"] = abs(until.timeIntervalSince(vanishedAt) - 1.0) < 0.4
         } else {
             checks["nextCountsFromVanish"] = false
         }
+        spin(0.4)
+        checks["vanishesAfterDisplay"] = vanished && abs(vanishedAt.timeIntervalSince(appeared) - 1.2) < 0.5 && gone(panel)
 
         // Schließen per Klick; lange Zeiten, damit nichts von selbst verschwindet
         display = 60
@@ -141,11 +177,12 @@ enum SelfTest {
         if let layout = before, let first = layout.placements.first {
             click(panel, canvasHeight: layout.canvas.height, at: first.closeRect)
             spin(0.3)
-            checks["closeOneByClick"] = engine.scheduler.visibleIDs.count == 2 && overlay.isShown
+            checks["closeOneByClick"] = engine.scheduler.visibleIDs.count == 2 && overlay.model.placedVisibleCount == 2
+                && !overlay.model.visible.contains(first.id) && onScreen(panel)
             checks["noReflowAfterClose"] = overlay.model.layout == before
             if let all = layout.closeAllRect { click(panel, canvasHeight: layout.canvas.height, at: all) }
             spin(0.4)
-            checks["closeAllByClick"] = engine.scheduler.visibleIDs.isEmpty && !overlay.isShown
+            checks["closeAllByClick"] = engine.scheduler.visibleIDs.isEmpty && gone(panel)
         } else {
             checks["closeOneByClick"] = false
         }
@@ -194,11 +231,13 @@ enum SelfTest {
         spin(0.1)
         engine.suspend(.locked)
         engine.showNow()
+        let firesBefore = engine.fireCount
         spin(0.6)
-        checks["lockedShowsNothing"] = !overlay.isShown
+        checks["noTimerWhileLocked"] = engine.fireCount == firesBefore
+        checks["lockedShowsNothing"] = gone(panel)
         engine.resume(.locked)
         spin(0.3)
-        checks["unlockShowsOverdue"] = overlay.isShown
+        checks["unlockShowsOverdue"] = overlay.isShown && onScreen(panel)
         interval = 60
         settings.onChange?()
         engine.closeAll()
@@ -230,10 +269,11 @@ enum SelfTest {
 
         store.stop()
 
-        checks["frontmostUnchanged"] = NSWorkspace.shared.frontmostApplication?.processIdentifier == frontBefore && !app.isActive
+        checks["frontmostUnchanged"] = !focusLost && !app.isActive
         checks["realFileUntouched"] = (try? Data(contentsOf: GoalStore.defaultFileURL)) == realBefore
 
-        let ok = !checks.isEmpty && checks.values.allSatisfy { $0 }
+        for name in expected where checks[name] == nil { checks[name] = false }
+        let ok = checks.values.allSatisfy { $0 }
         let lines = checks.keys.sorted().map { "    \"\($0)\": \(checks[$0]! ? "true" : "false")" }.joined(separator: ",\n")
         print("{\n  \"ok\": \(ok),\n  \"checks\": {\n\(lines)\n  }\n}")
         return ok ? 0 : 1

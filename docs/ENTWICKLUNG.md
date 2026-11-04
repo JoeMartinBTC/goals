@@ -24,12 +24,15 @@ Swift Package ohne Xcode-Projekt. Das Bundle baut `Scripts/build_local_app.sh`.
 - **Kein Umbruch beim Schließen:** Das Raster wird nur bei geändertem Inhalt neu gerechnet. Schließt man eine Karte, bleiben die anderen stehen, damit das nächste X nicht wegspringt.
 - **Hauptbildschirm:** `NSScreen.screens.first`, nicht `NSScreen.main`. Letzteres ist der Bildschirm mit dem aktiven Fenster.
 - **Takt ab dem Verschwinden:** Auch das Schließen der letzten Karte startet die Wartezeit. Ein neuer Takt gilt ab jetzt, eine neue Anzeigedauer auch für die laufende Anzeige.
-- **Kaputte Datei:** `GoalStore` sperrt dann jede Änderung und schreibt nichts. Fehlt die Datei im Betrieb, schreibt die App ihren Stand aus dem Speicher zurück.
-- **Keine Dauerarbeit:** Es gibt nur einen Timer auf den nächsten Termin, keine `TimelineView` und kein Abfragen im Overlay.
+- **Kaputte Datei:** `GoalStore` sperrt dann jede Änderung und schreibt nichts. Fehlt die Datei im Betrieb, schreibt die App den letzten guten Stand zurück und hebt die Sperre auf. Eine Datei ohne `cards` gilt als kaputt.
+- **Gleichzeitige Änderung:** Vor jedem Speichern vergleicht `GoalStore` die Platte mit dem zuletzt gelesenen Stand. Weicht sie ab, gewinnt die Datei, denn eine verlorene Eingabe sieht man sofort, eine überschriebene Datei nie.
+- **Keine Dauerarbeit:** Es gibt nur einen Timer auf den nächsten Termin, keine `TimelineView` und kein Abfragen im Overlay. Während einer Sperre gibt es keinen Termin (`nextFire == nil`); stattdessen gleicht ein Timer einmal je Minute die Sitzung ab.
+- **Sperre:** Die Meldungen `com.apple.screenIsLocked` und `…Unlocked` kommen mit `.deliverImmediately`, weil Goals fast immer im Hintergrund ist. Zusätzlich fragt jeder Timer-Durchlauf `CGSessionCopyCurrentDictionary`, damit eine verlorene Meldung nichts auf den Sperrbildschirm bringt.
 
 ## Prüf-Startmodi
 
-- `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Nutzt eine Wegwerf-Datei und Wegwerf-Einstellungen.
+- `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Sichtbarkeit fragt er beim Fensterdienst ab. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Die Sperre ruft er direkt auf, die echten Systemmeldungen laufen nicht mit. Nutzt eine Wegwerf-Datei und Wegwerf-Einstellungen.
+- `--autostart-status`: nennt den Stand des Anmeldeobjekts.
 - `--snapshot <ordner>`: 24 Bilder der Karten (vier Größen, sechs Farbdarstellungen) und zwei des Einstellungsfensters. Die Karten rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
 - `--show-for <sekunden> [--allow-capture]`: zeigt zwei Prüfkarten und nennt ihr Rechteck. So lässt sich die Aufzeichnungs-Sperre von außen prüfen.
 

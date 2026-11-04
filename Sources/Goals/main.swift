@@ -28,5 +28,6 @@ MainActor.assumeIsolated {
     let delegate = AppDelegate()
     app.delegate = delegate
     app.setActivationPolicy(.regular)
-    app.run()
+    // `NSApplication.delegate` hält nur schwach.
+    withExtendedLifetime(delegate) { app.run() }
 }

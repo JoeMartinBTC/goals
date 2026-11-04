@@ -66,7 +66,8 @@ extension GoalFile {
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         version = try c.decodeIfPresent(Int.self, forKey: .version) ?? 1
-        cards = try c.decodeIfPresent([GoalCard].self, forKey: .cards) ?? []
+        // Pflicht: Ein Tippfehler im Schlüssel darf nicht als leere Liste gelten, die das nächste Speichern überschreibt.
+        cards = try c.decode([GoalCard].self, forKey: .cards)
 
         // Fehlende und doppelte IDs eindeutig machen: Auswahl und Schließen hängen an der ID.
         var seen = Set<String>()

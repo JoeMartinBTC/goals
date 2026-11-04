@@ -32,10 +32,13 @@ public struct ReminderScheduler {
 
     public static func defaultRandomFactor() -> Double { Double.random(in: 0.8...1.2) }
 
+    /// Während einer Sperre kein Termin: `advance` täte nichts, ein Timer auf ein vergangenes Datum liefe im Kreis.
+    /// `resume` holt einen fälligen Termin nach.
     public var nextFire: Date? {
         switch phase {
         case .idle: return nil
-        case .waiting(let until), .showing(let until): return until
+        case .waiting(let until): return isSuspended ? nil : until
+        case .showing(let until): return until
         }
     }
 

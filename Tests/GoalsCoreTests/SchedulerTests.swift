@@ -189,6 +189,18 @@ struct SchedulerTests {
         #expect(s.visibleIDs == ["a", "b"])
     }
 
+    @Test("Während einer Sperre gibt es keinen Termin für den Timer, auch nicht nach Fälligkeit")
+    func noFireWhileSuspended() {
+        var s = scheduler()
+        s.suspend(.locked, now: t0)
+        #expect(s.nextFire == nil)
+        s.advance(now: t0.addingTimeInterval(700))
+        #expect(s.nextFire == nil)
+        s.resume(.locked, now: t0.addingTimeInterval(701))
+        #expect(s.isShowing)
+        #expect(s.nextFire == t0.addingTimeInterval(716))
+    }
+
     @Test("Jetzt zeigen wirkt nicht bei gesperrtem Bildschirm")
     func showNowWhileSuspended() {
         var s = scheduler()

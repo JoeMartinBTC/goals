@@ -261,6 +261,18 @@ struct SettingsTests {
         #expect(s.intervalMinutes == 1)
     }
 
+    @Test("Ein begrenzter Takt wird gespeichert und gemeldet", arguments: [(0, 1), (99_999, GoalSettings.maxIntervalMinutes)])
+    func clampedIntervalIsApplied(input: Int, expected: Int) {
+        let d = defaults()
+        let s = GoalSettings(defaults: d)
+        var calls = 0
+        s.onChange = { calls += 1 }
+        s.intervalMinutes = input
+        #expect(s.intervalMinutes == expected)
+        #expect(d.integer(forKey: "intervalMinutes") == expected)
+        #expect(calls == 1)
+    }
+
     @Test("Anzeigedauer nimmt nur die vier Stufen an")
     func displayOnlyPresets() {
         let s = GoalSettings(defaults: defaults())

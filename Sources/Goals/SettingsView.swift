@@ -25,6 +25,14 @@ struct SettingsRootView: View {
                     .padding(10)
                     .background(Color(hex: 0xA32D2D))
             }
+            if let error = store.saveError {
+                Text("\(error) Deine letzten Eingaben stehen nur im Speicher.")
+                    .font(.callout)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                    .background(Color(hex: 0xA32D2D))
+            }
             Picker("Bereich", selection: $navigation.tab) {
                 Text("Karten").tag(SettingsNavigation.Tab.cards)
                 Text("Anzeige").tag(SettingsNavigation.Tab.display)

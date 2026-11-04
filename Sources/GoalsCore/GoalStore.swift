@@ -6,11 +6,15 @@ public final class GoalStore: ObservableObject {
     @Published public private(set) var cards: [GoalCard] = []
     /// Gesetzt, solange die Datei nicht lesbar ist. Dann bleibt sie unangetastet und Änderungen sind gesperrt.
     @Published public private(set) var loadError: String?
+    /// Gesetzt, wenn das letzte Speichern scheiterte. Die Eingaben stehen dann nur im Speicher.
+    @Published public private(set) var saveError: String?
     public private(set) var wasCreated = false
     public var onChange: (() -> Void)?
 
     private let watcher = FileWatcher()
     private var pendingSave: DispatchWorkItem?
+    /// Inhalt der Datei beim letzten Lesen oder Schreiben. Weicht sie davon ab, hat sie jemand anders geändert.
+    private var lastDisk: Data?
 
     public init(fileURL: URL) {
         self.fileURL = fileURL
@@ -47,16 +51,22 @@ public final class GoalStore: ObservableObject {
         reload()
     }
 
-    /// Liest die Datei neu. Eine fehlende Datei bekommt den Stand aus dem Speicher zurück.
+    /// Liest die Datei neu. Eine fehlende Datei bekommt den letzten guten Stand aus dem Speicher zurück,
+    /// auch wenn sie vorher kaputt war: Löschen ist die naheliegende Reparatur.
     public func reload() {
-        // Eine noch nicht geschriebene Eingabe gewinnt gegen den Stand auf der Platte.
+        // Eine ausstehende Eingabe vergleicht `write` gleich selbst mit der Platte.
         guard pendingSave == nil else { return }
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            if loadError == nil { write() }
+            let hadError = loadError != nil
+            loadError = nil
+            lastDisk = nil
+            write()
+            if hadError { onChange?() }
             return
         }
         do {
             let data = try Data(contentsOf: fileURL)
+            lastDisk = data
             let file = try JSONDecoder().decode(GoalFile.self, from: data)
             let hadError = loadError != nil
             loadError = nil
@@ -132,13 +142,23 @@ public final class GoalStore: ObservableObject {
 
     private func write() {
         guard loadError == nil else { return }
+        // Wurde die Datei seit dem letzten Lesen von außen geändert, gewinnt sie. Eine verlorene Eingabe
+        // sieht man sofort im Fenster, eine überschriebene Datei nie. Eine kaputte Datei setzt so die Sperre.
+        if let disk = try? Data(contentsOf: fileURL), disk != lastDisk {
+            reload()
+            return
+        }
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         do {
             try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try encoder.encode(GoalFile(cards: cards)).write(to: fileURL, options: .atomic)
+            let data = try encoder.encode(GoalFile(cards: cards))
+            try data.write(to: fileURL, options: .atomic)
+            lastDisk = data
+            saveError = nil
         } catch {
             NSLog("Goals: Speichern fehlgeschlagen: \(error)")
+            saveError = "Speichern fehlgeschlagen: \(error.localizedDescription)"
         }
     }
 }

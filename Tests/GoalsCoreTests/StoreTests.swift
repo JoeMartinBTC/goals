@@ -158,6 +158,76 @@ struct StoreTests {
         #expect(store.cards.first?.title == "Bleibt")
     }
 
+    @Test("Wird eine kaputte Datei gelöscht, schreibt die App den letzten guten Stand zurück und hebt die Sperre auf")
+    func deletedBrokenFileRecovers() throws {
+        let url = try tempFile()
+        try #"{"cards":[{"title":"Gut"}]}"#.write(to: url, atomically: true, encoding: .utf8)
+        let store = GoalStore(fileURL: url)
+        store.load()
+        try "kaputt".write(to: url, atomically: true, encoding: .utf8)
+        store.reload()
+        #expect(store.loadError != nil)
+        try FileManager.default.removeItem(at: url)
+        store.reload()
+        #expect(store.loadError == nil)
+        #expect(try String(contentsOf: url, encoding: .utf8).contains("Gut"))
+        _ = store.add()
+        #expect(store.cards.count == 2)
+    }
+
+    @Test("Eine Datei ohne Kartenliste gilt als kaputt und wird nicht überschrieben", arguments: ["{}", #"{"card":[{"title":"Tippfehler"}]}"#])
+    func missingCardsIsBroken(text: String) throws {
+        let url = try tempFile()
+        try text.write(to: url, atomically: true, encoding: .utf8)
+        let store = GoalStore(fileURL: url)
+        store.load()
+        #expect(store.loadError != nil)
+        _ = store.add()
+        store.flush()
+        #expect(try String(contentsOf: url, encoding: .utf8) == text)
+    }
+
+    @Test("Eine gültige Änderung von außen kurz vor dem Speichern gewinnt")
+    func externalChangeBeforeSaveWins() throws {
+        let url = try tempFile()
+        let store = GoalStore(fileURL: url)
+        store.load()
+        _ = store.add()
+        let external = #"{"cards":[{"title":"Von außen"}]}"#
+        try external.write(to: url, atomically: true, encoding: .utf8)
+        store.flush()
+        #expect(try String(contentsOf: url, encoding: .utf8) == external)
+        #expect(store.cards.map(\.title) == ["Von außen"])
+    }
+
+    @Test("Eine kaputte Datei kurz vor dem Speichern bleibt unangetastet")
+    func brokenBeforeSaveIsKept() throws {
+        let url = try tempFile()
+        let store = GoalStore(fileURL: url)
+        store.load()
+        _ = store.add()
+        let broken = "{ kaputt"
+        try broken.write(to: url, atomically: true, encoding: .utf8)
+        store.flush()
+        #expect(try String(contentsOf: url, encoding: .utf8) == broken)
+        #expect(store.loadError != nil)
+    }
+
+    @Test("Ein gescheitertes Speichern wird gemeldet, ein gelungenes hebt die Meldung auf")
+    func saveErrorIsReported() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("goals-test-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let blocker = dir.appendingPathComponent("sub")
+        try "eine Datei statt eines Ordners".write(to: blocker, atomically: true, encoding: .utf8)
+        let store = GoalStore(fileURL: blocker.appendingPathComponent("goals.json"))
+        store.load()
+        #expect(store.saveError != nil)
+        try FileManager.default.removeItem(at: blocker)
+        _ = store.add()
+        store.flush()
+        #expect(store.saveError == nil)
+    }
+
     @Test("Hinzufügen, Abschalten, Verschieben, Löschen")
     func mutators() throws {
         let store = GoalStore(fileURL: try tempFile())

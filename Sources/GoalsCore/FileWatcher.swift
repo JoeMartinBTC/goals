@@ -35,15 +35,13 @@ final class FileWatcher {
         source = nil
     }
 
-    // Läuft auf `queue`. Fehlt der Pfad kurz (löschen und neu anlegen), versucht es weiter.
+    // Läuft auf `queue`. Fehlt der Pfad, versucht es erst schnell (löschen und neu anlegen), dann langsam weiter.
     private func arm(attempt: Int) {
         guard isRunning else { return }
         cancel()
         let fd = open(path, O_EVTONLY)
         guard fd >= 0 else {
-            if attempt < 20 {
-                queue.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.arm(attempt: attempt + 1) }
-            }
+            queue.asyncAfter(deadline: .now() + (attempt < 20 ? 0.5 : 5)) { [weak self] in self?.arm(attempt: attempt + 1) }
             return
         }
         let src = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: [.write, .delete, .rename], queue: queue)

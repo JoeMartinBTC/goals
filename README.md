@@ -15,7 +15,7 @@ Native macOS-App, die deine Ziele in einem einstellbaren Takt als Karten über a
 - **Wegklicken:** X je Karte, ab zwei Karten zusätzlich „Alle schließen“.
 - **Farbe:** einfarbig in Bitcoin-Orange auf Dunkel, oder farbig mit den Schemen Metall, Signal, Pastell, Nacht und eigenen Farben je Karte.
 - **Ort:** Mitte des Hauptbildschirms, per Ziehen verschiebbar, die Position bleibt gespeichert.
-- **Aufzeichnung:** Das Fenster verlangt von macOS, nicht in Bildschirmfreigaben und Aufnahmen zu erscheinen (`NSWindow.sharingType = .none`).
+- **Aufzeichnung:** Das Fenster verlangt von macOS, nicht in Bildschirmfreigaben und Aufnahmen zu erscheinen (`NSWindow.sharingType = .none`). Verlass dich nicht darauf: In den Apple Developer Forums wird berichtet, dass die Aufnahme von QuickTime solche Fenster trotzdem erfasst. Prüfe es mit deinem Programm, siehe `--show-for` in [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md).
 - Bei gesperrtem Bildschirm, Bildschirmschoner und im Ruhezustand erscheint nichts. Ein fälliger Termin folgt beim Entsperren.
 
 ![Einstellungsfenster](docs/einstellungen.png)
@@ -26,7 +26,7 @@ Das Symbol in der Menüleiste, das Dock-Symbol und der Rechtsklick auf eine Kart
 
 ## Die Datei
 
-Die Karten liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Änderungen von außen wirken sofort, auch von Editoren, die atomar speichern. Eine Datei, die nicht lesbar ist, bleibt unangetastet: Die App meldet das und speichert nichts, bis sie wieder lesbar ist.
+Die Karten liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Änderungen von außen wirken sofort, auch von Editoren, die atomar speichern. Treffen sie auf eine ungespeicherte Eingabe in der App, gewinnt die Datei. Eine Datei, die nicht lesbar ist, bleibt unangetastet: Die App meldet das und speichert nichts, bis sie wieder lesbar ist. Löschst du sie, schreibt die App den letzten guten Stand zurück.
 
 ```json
 {
@@ -38,7 +38,7 @@ Die Karten liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Ä
 }
 ```
 
-Alle Schlüssel außer `cards` sind freiwillig. Eigene Farben stehen je Karte unter `colors` mit `background`, `title` und `text` als Hex-Wert.
+Alle Schlüssel außer `cards` sind freiwillig. Eigene Farben stehen je Karte unter `colors` mit `background`, `title` und `text` als Hex-Wert. Unbekannte Schlüssel gehen beim nächsten Speichern in der App verloren.
 
 ## Bauen
 
