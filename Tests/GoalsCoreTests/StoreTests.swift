@@ -228,6 +228,39 @@ struct StoreTests {
         #expect(store.saveError == nil)
     }
 
+    @Test("Eine unlesbare Datei gilt als Konflikt und wird nicht ersetzt")
+    func unreadableFileIsKept() throws {
+        let url = try tempFile()
+        let store = GoalStore(fileURL: url)
+        store.load()
+        let before = try Data(contentsOf: url)
+        try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: url.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path) }
+        _ = store.add()
+        store.flush()
+        #expect(store.loadError != nil)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
+        #expect(try Data(contentsOf: url) == before)
+    }
+
+    @Test("Übernimmt die App den Stand der Datei, verschwindet die Meldung über ein gescheitertes Speichern")
+    func reloadClearsSaveError() throws {
+        let url = try tempFile()
+        let dir = url.deletingLastPathComponent()
+        let store = GoalStore(fileURL: url)
+        store.load()
+        try FileManager.default.setAttributes([.posixPermissions: 0o500], ofItemAtPath: dir.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: dir.path) }
+        _ = store.add()
+        store.flush()
+        #expect(store.saveError != nil)
+        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: dir.path)
+        try #"{"cards":[{"title":"Von außen"}]}"#.write(to: url, atomically: true, encoding: .utf8)
+        store.reload()
+        #expect(store.cards.map(\.title) == ["Von außen"])
+        #expect(store.saveError == nil)
+    }
+
     @Test("Hinzufügen, Abschalten, Verschieben, Löschen")
     func mutators() throws {
         let store = GoalStore(fileURL: try tempFile())

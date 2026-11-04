@@ -90,6 +90,7 @@ final class GoalsEngine: ObservableObject {
     }
 
     func resume(_ reason: ReminderScheduler.SuspendReason) {
+        syncLockState()   // zuerst: Fehlte die Sperr-Meldung, darf ein überfälliger Termin nicht auf den Sperrbildschirm
         scheduler.resume(reason, now: Date())
         sync()
     }
@@ -148,7 +149,9 @@ final class GoalsEngine: ObservableObject {
     private func syncLockState() {
         if Self.sessionIsLocked {
             scheduler.suspend(.locked, now: Date())
-        } else {
+        } else if scheduler.isSuspended(.locked) {
+            // Nach dem Entsperren läuft auch kein Bildschirmschoner mehr, selbst wenn seine Meldung fehlt.
+            scheduler.resume(.screensaver, now: Date())
             scheduler.resume(.locked, now: Date())
         }
     }
@@ -204,13 +207,7 @@ final class GoalsEngine: ObservableObject {
             distributedObservers.append(DistributedObserver(name: name) { [weak self] in
                 MainActor.assumeIsolated {
                     guard let self else { return }
-                    if begins {
-                        self.suspend(reason)
-                    } else {
-                        // Nach dem Entsperren läuft auch kein Bildschirmschoner mehr, selbst wenn seine Meldung fehlt.
-                        if reason == .locked { self.scheduler.resume(.screensaver, now: Date()) }
-                        self.resume(reason)
-                    }
+                    if begins { self.suspend(reason) } else { self.resume(reason) }
                 }
             })
         }

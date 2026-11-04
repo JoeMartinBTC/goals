@@ -201,6 +201,16 @@ struct SchedulerTests {
         #expect(s.nextFire == t0.addingTimeInterval(716))
     }
 
+    @Test("Der Sperrgrund ist einzeln abfragbar")
+    func reasonQuery() {
+        var s = scheduler()
+        s.suspend(.locked, now: t0)
+        #expect(s.isSuspended(.locked))
+        #expect(!s.isSuspended(.screensaver))
+        s.resume(.locked, now: t0)
+        #expect(!s.isSuspended(.locked))
+    }
+
     @Test("Jetzt zeigen wirkt nicht bei gesperrtem Bildschirm")
     func showNowWhileSuspended() {
         var s = scheduler()

@@ -70,6 +70,8 @@ public final class GoalStore: ObservableObject {
             let file = try JSONDecoder().decode(GoalFile.self, from: data)
             let hadError = loadError != nil
             loadError = nil
+            // Der Stand der Datei gilt jetzt; ungesicherte Eingaben gibt es nicht mehr.
+            saveError = nil
             if file.cards != cards {
                 cards = file.cards
                 onChange?()
@@ -144,9 +146,12 @@ public final class GoalStore: ObservableObject {
         guard loadError == nil else { return }
         // Wurde die Datei seit dem letzten Lesen von außen geändert, gewinnt sie. Eine verlorene Eingabe
         // sieht man sofort im Fenster, eine überschriebene Datei nie. Eine kaputte Datei setzt so die Sperre.
-        if let disk = try? Data(contentsOf: fileURL), disk != lastDisk {
-            reload()
-            return
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            let disk = try? Data(contentsOf: fileURL)
+            if disk == nil || disk != lastDisk {
+                reload()
+                return
+            }
         }
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]

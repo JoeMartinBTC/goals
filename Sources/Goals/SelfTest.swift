@@ -136,12 +136,12 @@ enum SelfTest {
         checks["appearsAfterInterval"] = spin(until: { overlay.isShown }, timeout: 1.5)
         let appeared = Date()
         checks["allCardsTogether"] = engine.scheduler.visibleIDs.count == 3 && overlay.model.placedVisibleCount == 3
-        spin(0.3)
+        spin(0.4)   // länger als das Einblenden
 
         // Fenster im echten Fensterdienst
         let info = windowInfo(panel)
         checks["layerAboveFloating"] = (info?[kCGWindowLayer as String] as? Int ?? 0) >= Int(CGWindowLevelForKey(.statusWindow))
-        // Nur die Markierung. Ob eine Aufnahme sie befolgt, entscheidet das Aufnahmeprogramm; das prüft `--show-for`.
+        // Nur die Markierung. Ob eine Aufnahme sie befolgt, zeigt ein Versuch von Hand mit `--show-for`.
         checks["sharingFlagNone"] = (info?[kCGWindowSharingState as String] as? Int) == 0
         checks["listedOnCurrentSpace"] = onScreen(panel)
         checks["visibleWhenShown"] = panel.isVisible && panel.alphaValue > 0.99

@@ -49,6 +49,8 @@ public struct ReminderScheduler {
 
     public var isSuspended: Bool { !suspensions.isEmpty }
 
+    public func isSuspended(_ reason: SuspendReason) -> Bool { suspensions.contains(reason) }
+
     /// Karten, die gerade auf dem Bildschirm stehen, in der Reihenfolge der Liste.
     public var visibleIDs: [String] {
         guard isShowing else { return [] }
