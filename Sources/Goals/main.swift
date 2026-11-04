@@ -1,6 +1,13 @@
 import AppKit
+import ServiceManagement
 
 let arguments = CommandLine.arguments
+
+// `Goals --autostart-status` nennt den Stand des Anmeldeobjekts; `sfltool dumpbtm` wartet auf macOS 27 auf eine Admin-Freigabe.
+if arguments.contains("--autostart-status") {
+    print(SMAppService.mainApp.status == .enabled ? "enabled" : "not enabled (\(SMAppService.mainApp.status.rawValue))")
+    exit(0)
+}
 
 // `Goals --selftest` prüft den Ablauf im echten Fenster, `Goals --snapshot <ordner>` rendert Bilder.
 if arguments.contains("--selftest") {
