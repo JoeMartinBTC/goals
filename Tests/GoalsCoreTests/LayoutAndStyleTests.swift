@@ -395,7 +395,7 @@ struct SettingsTests {
         s.displaySeconds = 22
         #expect(s.displaySeconds == 15)
         #expect(GoalSettings.displayOptions == [5, 10, 15, 30])
-        #expect(GoalSettings.intervalOptions == [15, 30, 60, 120, 240])
+        #expect(GoalSettings.intervalOptions == [1, 15, 30, 60, 120, 240])
     }
 
     @Test("Änderungen melden sich beim Beobachter")

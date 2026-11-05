@@ -11,7 +11,7 @@ enum SelfTest {
         "closeAllByClick", "closeOneByClick", "externalInPlace", "externalReplace", "fourWidths", "frontmostUnchanged",
         "layerAboveFloating", "listedOnCurrentSpace", "lockedShowsNothing", "nextCountsFromVanish", "noReflowAfterClose",
         "noTimerWhileLocked", "notBeforeInterval", "panelFlags", "positionResetCenters", "positionRestored",
-        "realFileUntouched", "sessionLockReadable", "sharingFlagNone", "singleCardAlone", "statusSymbolExists",
+        "realFileUntouched", "secondRoundAppears", "sessionLockReadable", "sharingFlagNone", "singleCardAlone", "statusSymbolExists",
         "unlockShowsOverdue", "vanishesAfterDisplay", "visibleWhenShown",
     ]
 
@@ -166,6 +166,9 @@ enum SelfTest {
         }
         let leftScreen = spin(until: { gone(panel) }, timeout: settle)
         checks["vanishesAfterDisplay"] = vanished && abs(vanishedAt.timeIntervalSince(appeared) - 2.0) < 1.0 && leftScreen
+
+        // Zweite Runde: Der Takt läuft nach dem Verschwinden von selbst weiter, und die Karten kommen wieder ganz sichtbar.
+        checks["secondRoundAppears"] = spin(until: { overlay.isShown && onScreen(panel) && panel.alphaValue > 0.99 }, timeout: 1 + settle)
 
         // Schließen per Klick; lange Zeiten, damit nichts von selbst verschwindet
         display = 60

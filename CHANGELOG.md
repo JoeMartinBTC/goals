@@ -1,5 +1,10 @@
 # Änderungen
 
+## 1.1.1 (2026-11-05)
+
+- Neuer Takt „1 Min.“ im Menü und im Einstellungsfenster, damit sich die Wiederholung schnell prüfen lässt.
+- Tests und `--selftest` prüfen jetzt auch, dass der Takt über mehrere Runden weiterläuft (`secondRoundAppears`).
+
 ## 1.1.0 (2026-11-05)
 
 - Acht Schemen mit einem eigenen Verlauf je Karte: Metall, Signal, Pastell und Nacht haben jetzt Verläufe, Fest, Minze, Himmel und Glut sind neu.

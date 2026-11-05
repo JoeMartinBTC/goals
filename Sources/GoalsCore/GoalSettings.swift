@@ -27,7 +27,7 @@ public enum CardSize: String, CaseIterable, Identifiable {
 /// Einstellungen außer den Kartentexten, dauerhaft in UserDefaults.
 public final class GoalSettings: ObservableObject {
     public static let displayOptions = [5, 10, 15, 30]
-    public static let intervalOptions = [15, 30, 60, 120, 240]
+    public static let intervalOptions = [1, 15, 30, 60, 120, 240]
     public static let maxIntervalMinutes = 24 * 60
 
     private let defaults: UserDefaults

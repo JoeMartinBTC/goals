@@ -76,13 +76,13 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die K
 
 ## Was geprüft wird
 
-`swift test` führt die Tests von `GoalsCore` aus: 80 Tests in den Gruppen Ablage, Einstellungen, Farben, Raster, Takt und Zeitangaben. Sie brauchen keinen Bildschirm.
+`swift test` führt die Tests von `GoalsCore` aus: 82 Tests in den Gruppen Ablage, Einstellungen, Farben, Raster, Takt und Zeitangaben. Sie brauchen keinen Bildschirm.
 
-`--selftest` endet mit Exit 0, wenn alles grün ist, mit 1 bei einem Fehler und mit 2 bei gesperrtem Bildschirm. Fehlt eine Prüfung im Ergebnis, zählt sie als gescheitert. Das sind die 29 Prüfungen:
+`--selftest` endet mit Exit 0, wenn alles grün ist, mit 1 bei einem Fehler und mit 2 bei gesperrtem Bildschirm. Fehlt eine Prüfung im Ergebnis, zählt sie als gescheitert. Das sind die 30 Prüfungen:
 
 | Bereich | Prüfungen |
 |---|---|
-| Takt und Anzeigedauer | `notBeforeInterval`, `appearsAfterInterval`, `allCardsTogether`, `vanishesAfterDisplay`, `nextCountsFromVanish` |
+| Takt und Anzeigedauer | `notBeforeInterval`, `appearsAfterInterval`, `allCardsTogether`, `vanishesAfterDisplay`, `nextCountsFromVanish`, `secondRoundAppears` |
 | Fenster | `listedOnCurrentSpace`, `visibleWhenShown`, `layerAboveFloating`, `sharingFlagNone`, `panelFlags`, `centeredOnMainScreen`, `statusSymbolExists`, `frontmostUnchanged` |
 | Klicks | `closeOneByClick`, `noReflowAfterClose`, `closeAllByClick` |
 | Größen | `singleCardAlone`, `fourWidths` |

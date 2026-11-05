@@ -12,7 +12,7 @@ Native macOS-App, die deine Ziele in einem einstellbaren Takt als Karten über a
 
 - **Goal-Karten** mit Überschrift, Unterüberschrift und Erklärung, jede einzeln ein- und ausschaltbar. Eine einzelne Karte steht allein, mehrere stehen gemeinsam in einem automatischen Raster.
 - **Vier Größen:** 360, 480, 640 und 900 pt Breite. Passt das Raster nicht auf den Bildschirm, nimmt die App die nächstkleinere Größe.
-- **Takt:** alle 15 Min., 30 Min., 1 Std., 2 Std., 4 Std. oder ein eigener Wert. Er zählt ab dem Verschwinden der Karten. Wahlweise streut er um ± 20 %.
+- **Takt:** alle 1 Min., 15 Min., 30 Min., 1 Std., 2 Std., 4 Std. oder ein eigener Wert. Er zählt ab dem Verschwinden der Karten. Wahlweise streut er um ± 20 %: Bei 15 Minuten liegen dann 12 bis 18 Minuten zwischen zwei Anzeigen. Das Menü nennt die Zeit bis zur nächsten Erinnerung.
 - **Anzeigedauer:** 5, 10, 15 oder 30 Sekunden für alle Karten gleichzeitig.
 - **Wegklicken:** X je Karte, ab zwei Karten zusätzlich „Alle schließen“.
 - **Farbe:** einfarbig in Bitcoin-Orange auf Dunkel, oder farbig mit Verläufen. Acht Schemen geben jeder Karte einen eigenen Verlauf: Metall, Signal, Pastell, Nacht, Fest, Minze, Himmel, Glut. Vier Schemen legen einen einzigen Verlauf über alle Karten zusammen: Morgenrot, Lagune, Polarlicht, Abendrot. Dazu kommen eigene Farben je Karte.

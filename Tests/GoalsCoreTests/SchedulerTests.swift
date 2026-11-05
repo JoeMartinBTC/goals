@@ -50,6 +50,33 @@ struct SchedulerTests {
         #expect(s.phase == .waiting(until: end.addingTimeInterval(600)))
     }
 
+    @Test("Der Takt läuft Runde um Runde weiter, jede Anzeige zählt ab dem Verschwinden der vorigen")
+    func repeatsEveryRound() {
+        var s = scheduler(interval: 60, display: 5)
+        var due = t0.addingTimeInterval(60)
+        for _ in 1...5 {
+            s.advance(now: due)
+            #expect(s.visibleIDs == ["a", "b"])
+            #expect(s.nextFire == due.addingTimeInterval(5))
+            let end = due.addingTimeInterval(5)
+            s.advance(now: end)
+            #expect(s.visibleIDs.isEmpty)
+            due = end.addingTimeInterval(60)
+            #expect(s.nextFire == due)
+        }
+    }
+
+    @Test("Ein leicht verfrühter Timer verliert keine Runde")
+    func earlyFireKeepsRound() {
+        var s = scheduler(interval: 60, display: 5)
+        let due = t0.addingTimeInterval(60)
+        s.advance(now: due.addingTimeInterval(-0.001))
+        #expect(s.visibleIDs.isEmpty)
+        #expect(s.nextFire == due)
+        s.advance(now: due)
+        #expect(s.visibleIDs == ["a", "b"])
+    }
+
     @Test("Eine geschlossene Karte geht, die andere bleibt")
     func closeOneKeepsOther() {
         var s = scheduler()
