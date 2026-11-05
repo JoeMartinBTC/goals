@@ -74,7 +74,7 @@ enum SelfTest {
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("goals.json")
-        try? json(["Prüfkarte A", "Prüfkarte B"]).write(to: url, atomically: true, encoding: .utf8)
+        try? json(["Prüfanzeige A", "Prüfanzeige B"]).write(to: url, atomically: true, encoding: .utf8)
         let suite = "goals-show-\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         defaults.removePersistentDomain(forName: suite)

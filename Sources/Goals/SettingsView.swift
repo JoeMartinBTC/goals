@@ -34,7 +34,7 @@ struct SettingsRootView: View {
                     .background(Color(hex: 0xA32D2D))
             }
             Picker("Bereich", selection: $navigation.tab) {
-                Text("Karten").tag(SettingsNavigation.Tab.cards)
+                Text("Zielanzeigen").tag(SettingsNavigation.Tab.cards)
                 Text("Anzeige").tag(SettingsNavigation.Tab.display)
             }
             .pickerStyle(.segmented)
@@ -81,7 +81,7 @@ private struct CardsTab: View {
                 List(selection: $selection) {
                     ForEach(store.cards) { card in
                         HStack(spacing: 8) {
-                            Toggle("Karte einschalten", isOn: Binding(
+                            Toggle("Zielanzeige einschalten", isOn: Binding(
                                 get: { card.isEnabled },
                                 set: { store.setEnabled(card.id, $0) }))
                                 .labelsHidden()
@@ -99,10 +99,10 @@ private struct CardsTab: View {
                 Divider()
                 HStack(spacing: 8) {
                     Button { selection = store.add().id } label: { Image(systemName: "plus") }
-                        .help("Karte hinzufügen")
+                        .help("Zielanzeige hinzufügen")
                         .accessibilityIdentifier("btn.addCard")
                     Button { confirmDelete = true } label: { Image(systemName: "minus") }
-                        .help("Gewählte Karte löschen")
+                        .help("Gewählte Zielanzeige löschen")
                         .disabled(selected == nil)
                         .accessibilityIdentifier("btn.removeCard")
                     Spacer()
@@ -116,7 +116,7 @@ private struct CardsTab: View {
                 CardEditor(card: card, store: store, settings: settings)
                     .id(card.id)
             } else {
-                Text("Links eine Karte wählen oder mit Plus eine neue anlegen.")
+                Text("Links eine Zielanzeige wählen oder mit Plus eine neue anlegen.")
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -126,7 +126,7 @@ private struct CardsTab: View {
             if let current = selection, !ids.contains(current) { selection = ids.first }
             if selection == nil { selection = ids.first }
         }
-        .confirmationDialog("Karte „\(selected?.title ?? "")“ löschen?", isPresented: $confirmDelete) {
+        .confirmationDialog("Zielanzeige „\(selected?.title ?? "")“ löschen?", isPresented: $confirmDelete) {
             Button("Löschen", role: .destructive) {
                 if let id = selection { store.remove(id) }
             }
@@ -254,7 +254,7 @@ private struct DisplayTab: View {
 
     var body: some View {
         Form {
-            Section("Karten") {
+            Section("Zielanzeigen") {
                 Picker("Größe", selection: $settings.size) {
                     ForEach(CardSize.allCases) { Text("\($0.title) · \(Int($0.width))").tag($0) }
                 }
@@ -286,7 +286,7 @@ private struct DisplayTab: View {
                 }
                 .pickerStyle(.segmented)
                 Picker("Schema", selection: schemeSelection) {
-                    Section("Verlauf je Karte") {
+                    Section("Verlauf je Zielanzeige") {
                         ForEach(ColorSchemeKind.perCard) { Text($0.title).tag($0) }
                     }
                     Section("Verlauf über die ganze Fläche") {
@@ -297,7 +297,7 @@ private struct DisplayTab: View {
                 }
                 .pickerStyle(.menu)
                 if settings.usesCustomColors {
-                    Text("Eigene Farben stellst du je Karte im Bereich „Karten“ ein.")
+                    Text("Eigene Farben stellst du je Zielanzeige im Bereich „Zielanzeigen“ ein.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -305,7 +305,7 @@ private struct DisplayTab: View {
             Section("App") {
                 Toggle("Beim Anmelden starten", isOn: Binding(get: { autoStart.isOn }, set: { autoStart.set($0) }))
                 HStack {
-                    Text("Position der Karten")
+                    Text("Position der Zielanzeigen")
                     Spacer()
                     Button("Zurück zur Mitte") { engine.resetPosition() }
                 }

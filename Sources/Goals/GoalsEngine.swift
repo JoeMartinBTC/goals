@@ -104,8 +104,8 @@ final class GoalsEngine: ObservableObject {
         if store.saveError != nil { return "Speichern fehlgeschlagen" }
         if scheduler.isSuspended { return "Pausiert, solange der Bildschirm ruht oder gesperrt ist" }
         switch scheduler.phase {
-        case .idle: return "Keine Karte eingeschaltet"
-        case .showing: return "Karten werden gezeigt"
+        case .idle: return "Keine Zielanzeige eingeschaltet"
+        case .showing: return "Zielanzeigen werden gezeigt"
         case .waiting(let until):
             return "Nächste Erinnerung in \(TimeText.remaining(seconds: until.timeIntervalSinceNow))"
         }

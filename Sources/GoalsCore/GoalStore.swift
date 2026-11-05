@@ -86,7 +86,7 @@ public final class GoalStore: ObservableObject {
 
     @discardableResult
     public func add() -> GoalCard {
-        let card = GoalCard(title: "Neue Karte")
+        let card = GoalCard(title: "Neue Zielanzeige")
         guard loadError == nil else { return card }
         cards.append(card)
         changed()

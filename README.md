@@ -1,23 +1,23 @@
 # Goals
 
-Native macOS-App, die deine Ziele in einem einstellbaren Takt als Karten über alles legt, was gerade auf dem Bildschirm läuft. Sie bleiben ein paar Sekunden stehen und verschwinden wieder von selbst. Dein aktives Programm behält dabei den Fokus, du kannst einfach weitertippen.
+Die Goal-App für macOS legt deine Ziele in einem einstellbaren Takt als Zielanzeigen über alles, was gerade auf dem Bildschirm läuft. Die Zielanzeigen bleiben ein paar Sekunden stehen und verschwinden wieder von selbst. Dein aktives Programm behält dabei den Fokus, du kannst einfach weitertippen.
 
 Projektseite: <https://librarycompass.com/goals/>
 
-![Drei Karten in der einfarbigen Darstellung](docs/karten-einfarbig.png)
+![Drei Zielanzeigen in der einfarbigen Darstellung](docs/karten-einfarbig.png)
 
-![Drei Karten im Schema Fest, jede mit eigenem Verlauf](docs/karten-farbig.png)
+![Drei Zielanzeigen im Schema Fest, jede mit eigenem Verlauf](docs/karten-farbig.png)
 
-![Drei Karten im Schema Morgenrot, ein Verlauf über alle Karten](docs/karten-flaeche.png)
+![Drei Zielanzeigen im Schema Morgenrot, ein Verlauf über alle Zielanzeigen](docs/karten-flaeche.png)
 
-## Was sie kann
+## Was die Goal-App kann
 
-- **Goal-Karten** mit Überschrift, Unterüberschrift und Erklärung, jede einzeln ein- und ausschaltbar. Eine einzelne Karte steht allein, mehrere stehen gemeinsam in einem automatischen Raster.
-- **Vier Größen:** 360, 480, 640 und 900 pt Breite. Passt das Raster nicht auf den Bildschirm, nimmt die App die nächstkleinere Größe.
-- **Takt:** alle 1 Min., 15 Min., 30 Min., 1 Std., 2 Std., 4 Std. oder ein eigener Wert. Er zählt ab dem Verschwinden der Karten. Wahlweise streut er um ± 20 %: Bei 15 Minuten liegen dann 12 bis 18 Minuten zwischen zwei Anzeigen. Das Menü nennt die Zeit bis zur nächsten Erinnerung.
-- **Anzeigedauer:** 5, 10, 15 oder 30 Sekunden für alle Karten gleichzeitig.
-- **Wegklicken:** X je Karte, ab zwei Karten zusätzlich „Alle schließen“.
-- **Farbe:** einfarbig in Bitcoin-Orange auf Dunkel, oder farbig mit Verläufen. Acht Schemen geben jeder Karte einen eigenen Verlauf: Metall, Signal, Pastell, Nacht, Fest, Minze, Himmel, Glut. Vier Schemen legen einen einzigen Verlauf über alle Karten zusammen: Morgenrot, Lagune, Polarlicht, Abendrot. Dazu kommen eigene Farben je Karte.
+- **Zielanzeigen** mit Überschrift, Unterüberschrift und Erklärung, jede einzeln ein- und ausschaltbar. Eine einzelne Zielanzeige steht allein, mehrere stehen gemeinsam in einem automatischen Raster.
+- **Vier Größen:** 360, 480, 640 und 900 pt Breite. Passt das Raster nicht auf den Bildschirm, nimmt die Goal-App die nächstkleinere Größe.
+- **Takt:** alle 1 Min., 15 Min., 30 Min., 1 Std., 2 Std., 4 Std. oder ein eigener Wert. Er zählt ab dem Verschwinden der Zielanzeigen. Wahlweise streut er um ± 20 %: Bei 15 Minuten liegen dann 12 bis 18 Minuten zwischen zwei Anzeigen. Das Menü nennt die Zeit bis zur nächsten Erinnerung.
+- **Anzeigedauer:** 5, 10, 15 oder 30 Sekunden für alle Zielanzeigen gleichzeitig.
+- **Wegklicken:** X je Zielanzeige, ab zwei Zielanzeigen zusätzlich „Alle schließen“.
+- **Farbe:** einfarbig in Bitcoin-Orange auf Dunkel, oder farbig mit Verläufen. Acht Schemen geben jeder Zielanzeige einen eigenen Verlauf: Metall, Signal, Pastell, Nacht, Fest, Minze, Himmel, Glut. Vier Schemen legen einen einzigen Verlauf über alle Zielanzeigen zusammen: Morgenrot, Lagune, Polarlicht, Abendrot. Dazu kommen eigene Farben je Zielanzeige.
 - **Ort:** Mitte des Hauptbildschirms, per Ziehen verschiebbar, die Position bleibt gespeichert.
 - **Aufzeichnung:** Das Fenster verlangt von macOS, nicht in Bildschirmfreigaben und Aufnahmen zu erscheinen (`NSWindow.sharingType = .none`). Verlass dich nicht darauf: In den Apple Developer Forums wird berichtet, dass die Aufnahme von QuickTime solche Fenster trotzdem erfasst. Prüfe es mit deinem Programm, siehe `--show-for` in [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md).
 - Bei gesperrtem Bildschirm, Bildschirmschoner und im Ruhezustand erscheint nichts. Ein fälliger Termin folgt beim Entsperren.
@@ -26,7 +26,7 @@ Projektseite: <https://librarycompass.com/goals/>
 
 ## Bedienung
 
-Das Symbol in der Menüleiste, das Dock-Symbol und der Rechtsklick auf eine Karte öffnen dasselbe Menü: Jetzt zeigen, Karten, Größe, Anzeigedauer, Takt, Farbe, Position zurücksetzen, Einstellungen, Autostart, Beenden. Ein Klick auf das Dock-Symbol öffnet die Einstellungen.
+Das Symbol in der Menüleiste, das Dock-Symbol und der Rechtsklick auf eine Zielanzeige öffnen dasselbe Menü: Jetzt zeigen, Zielanzeigen, Größe, Anzeigedauer, Takt, Farbe, Position zurücksetzen, Einstellungen, Autostart, Beenden. Ein Klick auf das Dock-Symbol öffnet die Einstellungen.
 
 Ab Werk gilt: Größe „Mittel“ (480 pt), 15 Sekunden Anzeigedauer, Takt 1 Stunde ohne Streuung, einfarbig. Ein eigener Takt darf zwischen 1 Minute und 24 Stunden liegen.
 
@@ -34,19 +34,19 @@ Ab Werk gilt: Größe „Mittel“ (480 pt), 15 Sekunden Anzeigedauer, Takt 1 St
 
 Die Farbe wählst du im Menü unter „Farbe“ oder im Einstellungsfenster im Bereich „Anzeige“.
 
-**Verlauf je Karte:** Jedes dieser acht Schemen hat sechs verschiedene Verläufe, ab der siebten Karte wiederholen sie sich.
+**Verlauf je Zielanzeige:** Jedes dieser acht Schemen hat sechs verschiedene Verläufe, ab der siebten Zielanzeige wiederholen sie sich.
 
-![Die acht Schemen mit einem Verlauf je Karte](docs/galerie-je-karte.png)
+![Die acht Schemen mit einem Verlauf je Zielanzeige](docs/galerie-je-karte.png)
 
-**Verlauf über die ganze Fläche:** Diese vier Schemen legen einen einzigen Verlauf über alle Karten. Jede Karte zeigt ihren Ausschnitt, die Lücken zwischen den Karten bleiben durchsichtig. Eine Karte allein zeigt den ganzen Verlauf.
+**Verlauf über die ganze Fläche:** Diese vier Schemen legen einen einzigen Verlauf über alle Zielanzeigen. Jede Zielanzeige zeigt ihren Ausschnitt, die Lücken zwischen den Zielanzeigen bleiben durchsichtig. Eine Zielanzeige allein zeigt den ganzen Verlauf.
 
 ![Die vier Schemen mit einem Verlauf über die ganze Fläche](docs/galerie-flaeche.png)
 
-**Eigene:** Hintergrund, Überschrift und Text stellst du je Karte im Bereich „Karten“ ein. Diese Karten und die einfarbige Darstellung haben keinen Verlauf.
+**Eigene:** Hintergrund, Überschrift und Text stellst du je Zielanzeige im Bereich „Zielanzeigen“ ein. Diese Zielanzeigen und die einfarbige Darstellung haben keinen Verlauf.
 
 ## Die Datei
 
-Die Karten liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Änderungen von außen wirken sofort, auch von Editoren, die atomar speichern. Treffen sie auf eine ungespeicherte Eingabe in der App, gewinnt die Datei. Eine Datei, die nicht lesbar ist, bleibt unangetastet: Die App meldet das und speichert nichts, bis sie wieder lesbar ist. Löschst du sie, schreibt die App den letzten guten Stand zurück.
+Die Zielanzeigen liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Änderungen von außen wirken sofort, auch von Editoren, die atomar speichern. Treffen sie auf eine ungespeicherte Eingabe in der Goal-App, gewinnt die Datei. Eine Datei, die nicht lesbar ist, bleibt unangetastet: Die Goal-App meldet das und speichert nichts, bis sie wieder lesbar ist. Löschst du die Datei, schreibt die Goal-App den letzten guten Stand zurück.
 
 ```json
 {
@@ -58,7 +58,7 @@ Die Karten liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Ä
 }
 ```
 
-Alle Schlüssel außer `cards` sind freiwillig. Eigene Farben stehen je Karte unter `colors` mit `background`, `title` und `text` als Hex-Wert. Unbekannte Schlüssel gehen beim nächsten Speichern in der App verloren.
+Alle Schlüssel außer `cards` sind freiwillig. Eigene Farben stehen je Zielanzeige unter `colors` mit `background`, `title` und `text` als Hex-Wert. Unbekannte Schlüssel gehen beim nächsten Speichern in der Goal-App verloren.
 
 ## Bauen
 
@@ -68,7 +68,7 @@ Voraussetzung: macOS 14 oder neuer und Xcode.
 bash Scripts/build_local_app.sh
 ```
 
-Das Skript baut die App, signiert sie ad hoc, installiert sie nach `/Applications` und startet sie. Beim ersten Start öffnet sich das Einstellungsfenster mit einer ausgeschalteten Beispielkarte, und die App trägt sich als Anmeldeobjekt ein.
+Das Skript baut die Goal-App, signiert ad hoc, installiert nach `/Applications` und startet die Goal-App. Beim ersten Start öffnet sich das Einstellungsfenster mit einer ausgeschalteten Beispiel-Zielanzeige, und die Goal-App trägt sich als Anmeldeobjekt ein.
 
 ## Prüfen
 
@@ -82,7 +82,7 @@ swift test
 
 ## Entfernen
 
-Schalte zuerst im Menü den Autostart aus und beende die App. Danach entfernen diese Befehle die App, deine Karten und die Einstellungen:
+Schalte zuerst im Menü den Autostart aus und beende die App. Danach entfernen diese Befehle die App, deine Zielanzeigen und die Einstellungen:
 
 ```bash
 rm -rf /Applications/Goals.app

@@ -79,7 +79,7 @@ final class GoalsMenu: NSObject, NSMenuDelegate {
                 store.setEnabled(card.id, !card.isEnabled)
             }
         }
-        menu.addItem(submenu("Karten", cards.isEmpty ? [ActionItem("Noch keine Karte", enabled: false) {}] : cards))
+        menu.addItem(submenu("Zielanzeigen", cards.isEmpty ? [ActionItem("Noch keine Zielanzeige", enabled: false) {}] : cards))
 
         menu.addItem(submenu("Größe", CardSize.allCases.map { size in
             ActionItem("\(size.title) (\(Int(size.width)) pt)", checked: settings.size == size) { settings.size = size }
@@ -104,7 +104,7 @@ final class GoalsMenu: NSObject, NSMenuDelegate {
             }
         }
         var colors: [NSMenuItem] = [ActionItem("Einfarbig", checked: settings.colorMode == .mono) { settings.colorMode = .mono }]
-        colors.append(.sectionHeader(title: "Verlauf je Karte"))
+        colors.append(.sectionHeader(title: "Verlauf je Zielanzeige"))
         colors += ColorSchemeKind.perCard.map(schemeItem)
         colors.append(.sectionHeader(title: "Verlauf über die ganze Fläche"))
         colors += ColorSchemeKind.wholeArea.map(schemeItem)

@@ -1,13 +1,13 @@
 # Goals — Projektfakten
 
-Native macOS-App: Goal-Karten erscheinen im eingestellten Takt als Overlay über allem, ohne dem aktiven Programm den Fokus zu nehmen. Swift Package ohne Xcode-Projekt, MIT-Lizenz, Repo `JoeMartinBTC/goals` auf GitHub (öffentlich seit 2026-11-05). Projektseite: <https://librarycompass.com/goals/>, Quelle im Repo LibraryCompass unter `web/goals/`, Bilder aus `--snapshot` (Ordner `seite/`).
+Native macOS-App: Zielanzeigen erscheinen im eingestellten Takt als Overlay über allem, ohne dem aktiven Programm den Fokus zu nehmen. Swift Package ohne Xcode-Projekt, MIT-Lizenz, Repo `JoeMartinBTC/goals` auf GitHub (öffentlich seit 2026-11-05). Projektseite: <https://librarycompass.com/goals/>, Quelle im Repo LibraryCompass unter `web/goals/`, Bilder aus `--snapshot` (Ordner `seite/`).
 
 Die Hausregeln stehen in `~/.claude/CLAUDE.md` und gelten hier unverändert. Diese Datei nennt nur, was für dieses Projekt gilt.
 
 ## Harte Grenzen
 
 1. **Nur Apple-Frameworks.** `Package.swift` hat keine fremde Abhängigkeit.
-2. **Echte Karten nie anfassen.** `~/Library/Application Support/Goals/goals.json` und die UserDefaults von `com.joemartinbtc.Goals` sind Betriebsdaten. Tests, `--selftest` und `--snapshot` arbeiten mit Wegwerf-Dateien.
+2. **Echte Zielanzeigen nie anfassen.** `~/Library/Application Support/Goals/goals.json` und die UserDefaults von `com.joemartinbtc.Goals` sind Betriebsdaten. Tests, `--selftest` und `--snapshot` arbeiten mit Wegwerf-Dateien.
 3. **Kein Klarname im Repo.** Lokale Pfade gehören deshalb nicht in Dateien des Repos. Die Probe steht im Vertrag, den die Brain-Notiz verlinkt, und nicht hier, denn sie enthält die Namen.
 4. **Das Repo ist öffentlich.** Jeder Push ist sofort sichtbar, die Klarnamen-Probe läuft deshalb vor dem Push.
 
@@ -15,8 +15,8 @@ Die Hausregeln stehen in `~/.claude/CLAUDE.md` und gelten hier unverändert. Die
 
 | Pfad | Inhalt |
 |---|---|
-| `Sources/GoalsCore/` | reine Logik: Karten, Datei, Takt, Raster, Farben, Einstellungen |
-| `Sources/Goals/` | App: Fenster, Karte, Menü, Einstellungsfenster, Prüf-Startmodi |
+| `Sources/GoalsCore/` | reine Logik: Zielanzeigen, Datei, Takt, Raster, Farben, Einstellungen |
+| `Sources/Goals/` | App: Fenster, Zielanzeige, Menü, Einstellungsfenster, Prüf-Startmodi |
 | `Tests/GoalsCoreTests/` | Tests von `GoalsCore` |
 | `Scripts/build_local_app.sh` | baut, signiert ad hoc, installiert nach `/Applications`, startet |
 | `docs/ENTWICKLUNG.md` | Aufbau, Entscheidungen, alle Prüfungen, Fallen |

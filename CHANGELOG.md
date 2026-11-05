@@ -1,5 +1,9 @@
 # Änderungen
 
+## 1.1.2 (2026-11-05)
+
+- Die Oberfläche sagt „Zielanzeige“ statt „Zielanzeige“, weil das Wort an Landkarten denken ließ. Die Datei `goals.json` bleibt unverändert gültig.
+
 ## 1.1.1 (2026-11-05)
 
 - Neuer Takt „1 Min.“ im Menü und im Einstellungsfenster, damit sich die Wiederholung schnell prüfen lässt.
@@ -8,11 +12,11 @@
 
 ## 1.1.0 (2026-11-05)
 
-- Acht Schemen mit einem eigenen Verlauf je Karte: Metall, Signal, Pastell und Nacht haben jetzt Verläufe, Fest, Minze, Himmel und Glut sind neu.
-- Vier neue Schemen mit einem einzigen Verlauf über alle Karten: Morgenrot, Lagune, Polarlicht, Abendrot.
+- Acht Schemen mit einem eigenen Verlauf je Zielanzeige: Metall, Signal, Pastell und Nacht haben jetzt Verläufe, Fest, Minze, Himmel und Glut sind neu.
+- Vier neue Schemen mit einem einzigen Verlauf über alle Zielanzeigen: Morgenrot, Lagune, Polarlicht, Abendrot.
 - Menü und Einstellungsfenster zeigen die Schemen in zwei Gruppen. Im Einstellungsfenster ist „Schema“ jetzt eine Auswahlliste.
 - Einfarbig und Eigene bleiben ohne Verlauf.
-- `--snapshot` schreibt zusätzlich zwei Übersichten aller Schemen mit je sechs Karten.
+- `--snapshot` schreibt zusätzlich zwei Übersichten aller Schemen mit je sechs Zielanzeigen.
 
 ## 1.0.0 (2026-11-04)
 
@@ -20,12 +24,12 @@ Erste Fassung.
 
 ### App
 
-- Goal-Karten mit Überschrift, Unterüberschrift und Erklärung, jede einzeln ein- und ausschaltbar.
+- Zielanzeigen mit Überschrift, Unterüberschrift und Erklärung, jede einzeln ein- und ausschaltbar.
 - Anzeige über allem, auch über Vollbild-Programmen, ohne dem aktiven Programm den Fokus zu nehmen.
-- Vier Größen, einstellbare Anzeigedauer, Takt ab dem Verschwinden der Karten, wahlweise mit Streuung.
-- Einfarbig oder farbig mit vier Schemen und eigenen Farben je Karte.
-- Menüleiste, Dock, Rechtsklick auf die Karte und Einstellungsfenster. Alles ist im Betrieb änderbar.
-- Die Karten liegen lesbar in `goals.json`, Änderungen von außen wirken sofort.
+- Vier Größen, einstellbare Anzeigedauer, Takt ab dem Verschwinden der Zielanzeigen, wahlweise mit Streuung.
+- Einfarbig oder farbig mit vier Schemen und eigenen Farben je Zielanzeige.
+- Menüleiste, Dock, Rechtsklick auf die Zielanzeige und Einstellungsfenster. Alles ist im Betrieb änderbar.
+- Die Zielanzeigen liegen lesbar in `goals.json`, Änderungen von außen wirken sofort.
 
 ### Verhalten nach der Abnahme
 
@@ -38,6 +42,6 @@ Erste Fassung.
 
 ### Prüfung
 
-- `--selftest` prüft 29 Punkte im echten Fenster, `--snapshot` rendert 26 Bilder, `--show-for` zeigt Prüfkarten für einen Versuch von außen.
+- `--selftest` prüft 29 Punkte im echten Fenster, `--snapshot` rendert 26 Bilder, `--show-for` zeigt Prüfanzeigen für einen Versuch von außen.
 - `--autostart-status` nennt den Stand des Anmeldeobjekts, weil `sfltool dumpbtm` auf macOS 27 auf eine Admin-Freigabe wartet.
 - Die Prüfmodi laufen auch aus dem installierten App-Paket. Der Selbsttest gibt dem Fensterdienst bis zu zwei Sekunden Zeit, statt fest zu warten.

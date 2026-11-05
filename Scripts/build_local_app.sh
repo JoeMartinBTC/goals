@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 APP_NAME="Goals"
 BUNDLE_ID="com.joemartinbtc.Goals"
-VERSION="1.1.1"
+VERSION="1.1.2"
 BUILD_DIR="build"
 APP_OUT="$BUILD_DIR/$APP_NAME.app"
 CONTENTS="$APP_OUT/Contents"
