@@ -4,7 +4,9 @@ Native macOS-App, die deine Ziele in einem einstellbaren Takt als Karten über a
 
 ![Drei Karten in der einfarbigen Darstellung](docs/karten-einfarbig.png)
 
-![Drei Karten im Farbschema Nacht](docs/karten-farbig.png)
+![Drei Karten im Schema Fest, jede mit eigenem Verlauf](docs/karten-farbig.png)
+
+![Drei Karten im Schema Morgenrot, ein Verlauf über alle Karten](docs/karten-flaeche.png)
 
 ## Was sie kann
 
@@ -13,7 +15,7 @@ Native macOS-App, die deine Ziele in einem einstellbaren Takt als Karten über a
 - **Takt:** alle 15 Min., 30 Min., 1 Std., 2 Std., 4 Std. oder ein eigener Wert. Er zählt ab dem Verschwinden der Karten. Wahlweise streut er um ± 20 %.
 - **Anzeigedauer:** 5, 10, 15 oder 30 Sekunden für alle Karten gleichzeitig.
 - **Wegklicken:** X je Karte, ab zwei Karten zusätzlich „Alle schließen“.
-- **Farbe:** einfarbig in Bitcoin-Orange auf Dunkel, oder farbig mit den Schemen Metall, Signal, Pastell, Nacht und eigenen Farben je Karte.
+- **Farbe:** einfarbig in Bitcoin-Orange auf Dunkel, oder farbig mit Verläufen. Acht Schemen geben jeder Karte einen eigenen Verlauf: Metall, Signal, Pastell, Nacht, Fest, Minze, Himmel, Glut. Vier Schemen legen einen einzigen Verlauf über alle Karten zusammen: Morgenrot, Lagune, Polarlicht, Abendrot. Dazu kommen eigene Farben je Karte.
 - **Ort:** Mitte des Hauptbildschirms, per Ziehen verschiebbar, die Position bleibt gespeichert.
 - **Aufzeichnung:** Das Fenster verlangt von macOS, nicht in Bildschirmfreigaben und Aufnahmen zu erscheinen (`NSWindow.sharingType = .none`). Verlass dich nicht darauf: In den Apple Developer Forums wird berichtet, dass die Aufnahme von QuickTime solche Fenster trotzdem erfasst. Prüfe es mit deinem Programm, siehe `--show-for` in [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md).
 - Bei gesperrtem Bildschirm, Bildschirmschoner und im Ruhezustand erscheint nichts. Ein fälliger Termin folgt beim Entsperren.

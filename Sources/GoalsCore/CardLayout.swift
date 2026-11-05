@@ -14,6 +14,11 @@ public struct OverlayLayout: Equatable {
     public var closeAllRect: CGRect?
     /// Karten, die selbst in der kleinsten Größe nicht mehr auf den Bildschirm passen.
     public var hiddenCount: Int
+
+    /// Rechteck um alle Karten. Ein Verlauf über die ganze Fläche läuft darin.
+    public var cardsBounds: CGRect {
+        placements.reduce(CGRect.null) { $0.union($1.frame) }
+    }
 }
 
 public enum OverlayHit: Equatable {

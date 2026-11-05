@@ -40,6 +40,18 @@ struct GoalCardView: View {
     var height: CGFloat? = nil
     var showsClose = true
 
+    @ViewBuilder
+    private var surface: some View {
+        let shape = RoundedRectangle(cornerRadius: size.metrics.corner)
+        if let gradient = palette.gradient {
+            shape.fill(LinearGradient(colors: gradient.colors.map { Color(hex: $0) },
+                                      startPoint: UnitPoint(x: gradient.start.x, y: gradient.start.y),
+                                      endPoint: UnitPoint(x: gradient.end.x, y: gradient.end.y)))
+        } else {
+            shape.fill(Color(hex: palette.background))
+        }
+    }
+
     var body: some View {
         let m = size.metrics
         // Das X sitzt oben rechts; die ersten Zeilen dürfen nicht darunter laufen.
@@ -70,7 +82,7 @@ struct GoalCardView: View {
         .padding(m.padding)
         .frame(width: size.width, height: height, alignment: .topLeading)
         .clipShape(RoundedRectangle(cornerRadius: m.corner))
-        .background(RoundedRectangle(cornerRadius: m.corner).fill(Color(hex: palette.background)))
+        .background(surface)
         .overlay(RoundedRectangle(cornerRadius: m.corner).strokeBorder(Color(hex: palette.border), lineWidth: 1.5))
         .overlay(alignment: .topTrailing) {
             if showsClose {
@@ -121,7 +133,8 @@ struct OverlayContentView: View {
             ZStack(alignment: .topLeading) {
                 ForEach(layout.placements) { placement in
                     if let entry = model.entries[placement.id] {
-                        GoalCardView(card: entry.card, palette: entry.palette, size: layout.size, height: placement.frame.height)
+                        GoalCardView(card: entry.card, palette: entry.palette.placed(tile: placement.frame, bounds: layout.cardsBounds),
+                                     size: layout.size, height: placement.frame.height)
                             .compositingGroup()   // sonst bekäme auch jede Schrift einen eigenen Schatten
                             .shadow(color: .black.opacity(0.35), radius: 8, y: 3)
                             .opacity(model.visible.contains(placement.id) ? 1 : 0)

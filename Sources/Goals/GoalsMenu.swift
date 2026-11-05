@@ -97,13 +97,19 @@ final class GoalsMenu: NSObject, NSMenuDelegate {
         })
         menu.addItem(submenu("Takt", interval))
 
-        var colors = [ActionItem("Einfarbig", checked: settings.colorMode == .mono) { settings.colorMode = .mono }]
-        colors += ColorSchemeKind.allCases.map { scheme in
+        let schemeItem = { (scheme: ColorSchemeKind) -> NSMenuItem in
             ActionItem(scheme.title, checked: settings.colorMode == .color && settings.scheme == scheme) {
                 settings.scheme = scheme
                 settings.colorMode = .color
             }
         }
+        var colors: [NSMenuItem] = [ActionItem("Einfarbig", checked: settings.colorMode == .mono) { settings.colorMode = .mono }]
+        colors.append(.sectionHeader(title: "Verlauf je Karte"))
+        colors += ColorSchemeKind.perCard.map(schemeItem)
+        colors.append(.sectionHeader(title: "Verlauf über die ganze Fläche"))
+        colors += ColorSchemeKind.wholeArea.map(schemeItem)
+        colors.append(.separator())
+        colors.append(schemeItem(.eigene))
         menu.addItem(submenu("Farbe", colors))
         menu.addItem(ActionItem("Takt streuen (± 20 %)", checked: settings.jitter) { settings.jitter.toggle() })
 

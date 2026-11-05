@@ -39,7 +39,7 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die K
 | `intervalMinutes` | 1 bis 1440 | 60 |
 | `jitter` | wahr oder falsch | falsch |
 | `colorMode` | `mono`, `color` | `mono` |
-| `scheme` | `metall`, `signal`, `pastell`, `nacht`, `eigene` | `metall` |
+| `scheme` | `metall`, `signal`, `pastell`, `nacht`, `fest`, `minze`, `himmel`, `glut`, `morgenrot`, `lagune`, `polarlicht`, `abendrot`, `eigene` | `metall` |
 | `positionX`, `positionY` | Versatz gegen die Mitte des Hauptbildschirms | 0 |
 | `autostartInitialized` | merkt sich den einmaligen Eintrag als Anmeldeobjekt | fehlt |
 
@@ -49,6 +49,9 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die K
 - **`.stationary` fehlt absichtlich.** `CGWindowList` meldet solche Fenster auf skalierten Bildschirmen verkleinert, das würde die Fensterprobe verfälschen.
 - **Klicks:** `OverlayPanel.sendEvent` fängt Maus-Ereignisse ab, `CardLayout.hit` rechnet das Ziel aus. Der SwiftUI-Inhalt hat `allowsHitTesting(false)`. Damit ist jedes Klickziel ohne Bildschirm testbar.
 - **Kein Umbruch beim Schließen:** Das Raster wird nur bei geändertem Inhalt neu gerechnet. Schließt man eine Karte, bleiben die anderen stehen, damit das nächste X nicht wegspringt.
+- **Verläufe:** `CardGradient` rechnet den Winkel wie CSS in zwei Punkte der Kartenfläche um. Die acht Schemen je Karte haben je sechs Verläufe, ab der siebten Karte wiederholen sie sich. Die Verläufe von Fest, Minze und Himmel und die Flächen Morgenrot und Lagune lehnen sich an die Verläufe von Partiful an.
+- **Verlauf über die ganze Fläche:** Die vier Flächen-Schemen laufen im Rechteck um alle Karten (`OverlayLayout.cardsBounds`). `CardGradient.section` rechnet die beiden Punkte in die Fläche der einzelnen Karte um, die Punkte dürfen dabei außerhalb von 0 bis 1 liegen. So teilen alle Karten dieselbe Achse, und der Verlauf läuft über die Lücken hinweg weiter. Die Lücken selbst bleiben durchsichtig. Eine Karte allein zeigt den ganzen Verlauf.
+- **Lesbarkeit:** Ein Test prüft Überschrift, Unterzeile und Text gegen zehn Stufen je Abschnitt jedes Verlaufs, mindestens 4,5 : 1. Ein Flächen-Schema hat deshalb durchgehend helle oder durchgehend dunkle Farben, denn jede Karte kann jeden Abschnitt zeigen.
 - **Hauptbildschirm:** `NSScreen.screens.first`, nicht `NSScreen.main`. Letzteres ist der Bildschirm mit dem aktiven Fenster.
 - **Takt ab dem Verschwinden:** Auch das Schließen der letzten Karte startet die Wartezeit. Ein neuer Takt gilt ab jetzt, eine neue Anzeigedauer auch für die laufende Anzeige.
 - **Kaputte Datei:** `GoalStore` sperrt dann jede Änderung und schreibt nichts. Fehlt die Datei im Betrieb, schreibt die App den letzten guten Stand zurück und hebt die Sperre auf. Eine Datei ohne `cards` gilt als kaputt.
@@ -60,12 +63,12 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die K
 
 - `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Sichtbarkeit fragt er beim Fensterdienst ab und gibt ihm bis zu zwei Sekunden Zeit, damit eine ausgelastete Maschine kein falsches Rot ergibt. `frontmostUnchanged` wird nur rot, wenn der Selbsttest selbst nach vorn kommt; ein Wechsel zwischen anderen Programmen zählt nicht. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Die Sperre ruft er direkt auf, die echten Systemmeldungen laufen nicht mit. Nutzt eine Wegwerf-Datei und Wegwerf-Einstellungen.
 - `--autostart-status`: nennt den Stand des Anmeldeobjekts.
-- `--snapshot <ordner>`: 24 Bilder der Karten (vier Größen, sechs Farbdarstellungen) und zwei des Einstellungsfensters. Die Karten rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
+- `--snapshot <ordner>`: 56 Bilder der Karten (vier Größen, 14 Farbdarstellungen) und zwei des Einstellungsfensters. Die Karten rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
 - `--show-for <sekunden> [--allow-capture]`: zeigt zwei Prüfkarten und nennt ihr Rechteck. So lässt sich die Aufzeichnungs-Sperre von außen prüfen.
 
 ## Was geprüft wird
 
-`swift test` führt die Tests von `GoalsCore` aus: 71 Tests in den Gruppen Ablage, Einstellungen, Farben, Raster, Takt und Zeitangaben. Sie brauchen keinen Bildschirm.
+`swift test` führt die Tests von `GoalsCore` aus: 80 Tests in den Gruppen Ablage, Einstellungen, Farben, Raster, Takt und Zeitangaben. Sie brauchen keinen Bildschirm.
 
 `--selftest` endet mit Exit 0, wenn alles grün ist, mit 1 bei einem Fehler und mit 2 bei gesperrtem Bildschirm. Fehlt eine Prüfung im Ergebnis, zählt sie als gescheitert. Das sind die 29 Prüfungen:
 
@@ -95,4 +98,5 @@ Diese vier Punkte prüft nur ein Mensch:
 - Die Prüfmodi laufen ohne `app.run()`. Unter einer schon gelaufenen Bundle-ID ordnet AppKit dann keine Fenster an, obwohl `isVisible` `true` meldet. `main.swift` setzt deshalb für diese Modi `ApplePersistenceIgnoreState`, nur im Prozess. Ein grüner Lauf aus `.build` sagt darüber nichts, denn dort gibt es keine Bundle-ID. Geprüft wird das installierte Paket.
 - Den normalen Betrieb prüft man ohne echte Daten mit einem Wegwerf-Ordner: `CFFIXED_USER_HOME=<ordner> /Applications/Goals.app/Contents/MacOS/Goals -intervalMinutes 1 -displaySeconds 5 -autostartInitialized YES`. Die Karten liegen dann unter `<ordner>/Library/Application Support/Goals/goals.json`. Einstellungen aus diesem Ordner liest die App nicht, deshalb stehen sie als Startargumente im Befehl.
 - Prüfen im Vollbild: Ein Hilfsprogramm geht mit eigenem Fenster per `toggleFullScreen` in den Vollbildmodus und startet dort `--selftest`. Die Prüfung `listedOnCurrentSpace` zeigt dann, ob das Overlay auf dem Vollbild-Space liegt.
+- Ein Byte-Vergleich von `--snapshot` über zwei Builds taugt nicht. Beim Schritt auf 1.1.0 wichen die Bilder von Einfarbig und Eigene um höchstens 2 von 255 Stufen ab, nur das erste Bild des Laufs war gleich. Zwei Läufe desselben Builds sind Byte für Byte gleich. Vergleiche über Builds hinweg brauchen eine Schwelle.
 - Ob eine Aufzeichnung die Karten wirklich auslässt, zeigt nur ein echter Versuch: `--show-for 15` starten und ein Bildschirmfoto machen. Das braucht das Recht auf Bildschirmaufnahme.

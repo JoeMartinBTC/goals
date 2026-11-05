@@ -286,9 +286,16 @@ private struct DisplayTab: View {
                 }
                 .pickerStyle(.segmented)
                 Picker("Schema", selection: schemeSelection) {
-                    ForEach(ColorSchemeKind.allCases) { Text($0.title).tag($0) }
+                    Section("Verlauf je Karte") {
+                        ForEach(ColorSchemeKind.perCard) { Text($0.title).tag($0) }
+                    }
+                    Section("Verlauf über die ganze Fläche") {
+                        ForEach(ColorSchemeKind.wholeArea) { Text($0.title).tag($0) }
+                    }
+                    Divider()
+                    Text(ColorSchemeKind.eigene.title).tag(ColorSchemeKind.eigene)
                 }
-                .pickerStyle(.segmented)
+                .pickerStyle(.menu)
                 if settings.usesCustomColors {
                     Text("Eigene Farben stellst du je Karte im Bereich „Karten“ ein.")
                         .font(.callout)
