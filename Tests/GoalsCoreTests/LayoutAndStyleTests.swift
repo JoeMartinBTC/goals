@@ -11,7 +11,7 @@ struct LayoutTests {
         CardLayout.fit(ids: (0..<n).map { "c\($0)" }, preferred: size, available: available ?? screen) { _, _ in height }
     }
 
-    @Test("Eine einzelne Karte steht allein, ohne Knopf „Alle schließen“")
+    @Test("Eine einzelne Zielanzeige steht allein, ohne Knopf „Alle schließen“")
     func singleCard() {
         let l = fit(1)
         #expect(l.placements.count == 1)
@@ -19,14 +19,14 @@ struct LayoutTests {
         #expect(l.closeAllRect == nil)
     }
 
-    @Test("Bis drei Karten stehen in einer Reihe")
+    @Test("Bis drei Zielanzeigen stehen in einer Reihe")
     func threeInRow() {
         let l = fit(3)
         #expect(Set(l.placements.map(\.frame.minY)).count == 1)
         #expect(l.closeAllRect != nil)
     }
 
-    @Test("Vier Karten bilden zwei mal zwei")
+    @Test("Vier Zielanzeigen bilden zwei mal zwei")
     func fourAreSquare() {
         let l = fit(4)
         #expect(Set(l.placements.map(\.frame.minY)).count == 2)
@@ -42,7 +42,7 @@ struct LayoutTests {
         #expect(abs(left - right) < 0.5)
     }
 
-    @Test("Karten einer Reihe sind gleich hoch")
+    @Test("Zielanzeigen einer Reihe sind gleich hoch")
     func rowHeightsEqual() {
         let l = CardLayout.fit(ids: ["a", "b"], preferred: .small, available: screen) { id, _ in id == "a" ? 100 : 300 }
         #expect(l.placements[0].frame.height == 300)
@@ -58,13 +58,13 @@ struct LayoutTests {
         #expect(l.canvas.height <= 1000)
     }
 
-    @Test("Eine zu breite Karte fällt auf die passende Größe zurück")
+    @Test("Eine zu breite Zielanzeige fällt auf die passende Größe zurück")
     func tooWideFallsBack() {
         let l = fit(1, .xlarge, available: CGSize(width: 700, height: 900))
         #expect(l.size == .large)
     }
 
-    @Test("Passt selbst die kleinste Größe nicht, zählt das Raster die fehlenden Karten")
+    @Test("Passt selbst die kleinste Größe nicht, zählt das Raster die fehlenden Zielanzeigen")
     func dropsAndCounts() {
         let l = fit(40, .small, available: CGSize(width: 800, height: 700), height: 300)
         #expect(l.size == .small)
@@ -73,13 +73,13 @@ struct LayoutTests {
         #expect(l.canvas.height <= 700)
     }
 
-    @Test("Eine überlange Karte wird auf den Bildschirm begrenzt")
+    @Test("Eine überlange Zielanzeige wird auf den Bildschirm begrenzt")
     func tallCardClamped() {
         let l = fit(1, .small, available: CGSize(width: 800, height: 400), height: 5000)
         #expect(l.canvas.height <= 400)
     }
 
-    @Test("Das Rechteck um alle Karten reicht von der ersten bis zur letzten Karte")
+    @Test("Das Rechteck um alle Zielanzeigen reicht von der ersten bis zur letzten Zielanzeige")
     func cardsBounds() {
         let l = fit(5)
         let frames = l.placements.map(\.frame)
@@ -90,7 +90,7 @@ struct LayoutTests {
         #expect(fit(1).cardsBounds == fit(1).placements[0].frame)
     }
 
-    @Test("Klickziele: X, Alle schließen, Karte, Lücke")
+    @Test("Klickziele: X, Alle schließen, Zielanzeige, Lücke")
     func hitTest() {
         let l = fit(2)
         let visible: Set<String> = ["c0", "c1"]
@@ -105,7 +105,7 @@ struct LayoutTests {
         #expect(CardLayout.hit(gap, in: l, visible: visible) == .none)
     }
 
-    @Test("Eine geschlossene Karte ist kein Klickziel, „Alle schließen“ braucht zwei Karten")
+    @Test("Eine geschlossene Zielanzeige ist kein Klickziel, „Alle schließen“ braucht zwei Zielanzeigen")
     func closedCardNotHit() {
         let l = fit(2)
         let c0 = l.placements[0]
@@ -176,7 +176,7 @@ struct PaletteTests {
         abs(a.x - b.x) < 0.001 && abs(a.y - b.y) < 0.001
     }
 
-    @Test("Acht Schemen mit einem Verlauf je Karte, vier über die ganze Fläche")
+    @Test("Acht Schemen mit einem Verlauf je Zielanzeige, vier über die ganze Fläche")
     func schemeCounts() {
         #expect(ColorSchemeKind.perCard.count == 8)
         #expect(ColorSchemeKind.wholeArea.count == 4)
@@ -190,7 +190,7 @@ struct PaletteTests {
         }
     }
 
-    @Test("Je Karte: Die ersten sechs Karten zeigen sechs verschiedene Verläufe", arguments: ColorSchemeKind.perCard)
+    @Test("Je Zielanzeige: Die ersten sechs Zielanzeigen zeigen sechs verschiedene Verläufe", arguments: ColorSchemeKind.perCard)
     func eachCardHasOwnGradient(scheme: ColorSchemeKind) {
         let gradients = (0..<6).compactMap { Palettes.palette(index: $0, mode: .color, scheme: scheme, custom: nil).gradient?.colors }
         #expect(gradients.count == 6)
@@ -223,7 +223,7 @@ struct PaletteTests {
         #expect(isClose(g.end, end))
     }
 
-    @Test("Ganze Fläche: Jede Karte zeigt einen Ausschnitt derselben Achse")
+    @Test("Ganze Fläche: Jede Zielanzeige zeigt einen Ausschnitt derselben Achse")
     func sharedAxis() {
         let g = CardGradient(colors: [0, 0xFFFFFF], angle: 120, spansCards: true)
         let bounds = CGRect(x: 16, y: 16, width: 1476, height: 410)
@@ -239,7 +239,7 @@ struct PaletteTests {
         }
     }
 
-    @Test("Ganze Fläche: Die Lage bestimmt den Ausschnitt, eine Karte allein zeigt alles")
+    @Test("Ganze Fläche: Die Lage bestimmt den Ausschnitt, eine Zielanzeige allein zeigt alles")
     func placedWholeArea() {
         let p = Palettes.palette(index: 0, mode: .color, scheme: .morgenrot, custom: nil)
         let bounds = CGRect(x: 16, y: 16, width: 978, height: 196)
@@ -251,7 +251,7 @@ struct PaletteTests {
         #expect(isClose(alone.gradient!.end, p.gradient!.end))
     }
 
-    @Test("Je Karte: Die Lage ändert den Verlauf nicht")
+    @Test("Je Zielanzeige: Die Lage ändert den Verlauf nicht")
     func placedPerCard() {
         let p = Palettes.palette(index: 1, mode: .color, scheme: .fest, custom: nil)
         let placed = p.placed(tile: CGRect(x: 514, y: 16, width: 480, height: 196), bounds: CGRect(x: 16, y: 16, width: 978, height: 196))
@@ -270,14 +270,14 @@ struct PaletteTests {
         for i in 0..<12 {
             let p = Palettes.palette(index: i, mode: .color, scheme: scheme, custom: nil)
             for color in surface(p) {
-                #expect(contrast(p.title, color) >= 4.5, "Titel, Karte \(i)")
-                #expect(contrast(p.subtitle, color) >= 4.5, "Unterzeile, Karte \(i)")
-                #expect(contrast(p.text, color) >= 4.5, "Text, Karte \(i)")
+                #expect(contrast(p.title, color) >= 4.5, "Titel, Zielanzeige \(i)")
+                #expect(contrast(p.subtitle, color) >= 4.5, "Unterzeile, Zielanzeige \(i)")
+                #expect(contrast(p.text, color) >= 4.5, "Text, Zielanzeige \(i)")
             }
         }
     }
 
-    @Test("Im Modus Farbig bekommt jede Karte eine eigene Farbe", arguments: ColorSchemeKind.perCard)
+    @Test("Im Modus Farbig bekommt jede Zielanzeige eine eigene Farbe", arguments: ColorSchemeKind.perCard)
     func eachCardDiffers(scheme: ColorSchemeKind) {
         let all = (0..<4).map { Palettes.palette(index: $0, mode: .color, scheme: scheme, custom: nil) }
         #expect(Set(all.map(\.title)).count == 4 || Set(all.map(\.background)).count == 4)
@@ -316,11 +316,24 @@ struct PaletteTests {
 
 @Suite("Einstellungen")
 struct SettingsTests {
-    func defaults() -> UserDefaults {
-        let name = "goals-test-\(UUID().uuidString)"
-        let d = UserDefaults(suiteName: name)!
-        d.removePersistentDomain(forName: name)
-        return d
+    func defaults() -> UserDefaults { MemoryDefaults() }
+
+    @Test("Wegwerf-Einstellungen bleiben im Speicher und schreiben keine Datei")
+    func memoryDefaultsWriteNothing() {
+        let d = MemoryDefaults()
+        d.set(7, forKey: "displaySeconds")
+        d.set(true, forKey: "jitter")
+        d.set(1.5, forKey: "positionX")
+        d.set("riesig", forKey: "size")
+        #expect(d.integer(forKey: "displaySeconds") == 7)
+        #expect(d.bool(forKey: "jitter"))
+        #expect(d.double(forKey: "positionX") == 1.5)
+        #expect(d.string(forKey: "size") == "riesig")
+        d.synchronize()
+        #expect(UserDefaults(suiteName: "goals-im-speicher")?.object(forKey: "displaySeconds") == nil)
+        let file = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Preferences/goals-im-speicher.plist")
+        #expect(!FileManager.default.fileExists(atPath: file.path))
     }
 
     @Test("Vier Größen mit den vereinbarten Breiten")

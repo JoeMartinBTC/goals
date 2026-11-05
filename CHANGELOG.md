@@ -3,6 +3,7 @@
 ## 1.1.2 (2026-11-05)
 
 - Die Oberfläche sagt „Zielanzeige“ statt „Zielanzeige“, weil das Wort an Landkarten denken ließ. Die Datei `goals.json` bleibt unverändert gültig.
+- Tests und Prüfmodi halten ihre Einstellungen nur noch im Speicher und hinterlassen keine Dateien mehr in den Preferences.
 
 ## 1.1.1 (2026-11-05)
 

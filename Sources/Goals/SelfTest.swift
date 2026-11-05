@@ -2,7 +2,7 @@ import AppKit
 import GoalsCore
 
 /// `Goals --selftest`: prüft den echten Ablauf im echten Fenster, mit kurzen Zeiten und einer Wegwerf-Datei.
-/// Die Karten erscheinen dabei rund 10 Sekunden lang mehrfach auf dem Bildschirm.
+/// Die Zielanzeigen erscheinen dabei rund 10 Sekunden lang mehrfach auf dem Bildschirm.
 @MainActor
 enum SelfTest {
     /// Jede Prüfung muss laufen. Fehlt eine im Ergebnis, zählt sie als gescheitert.
@@ -75,10 +75,7 @@ enum SelfTest {
         defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("goals.json")
         try? json(["Prüfanzeige A", "Prüfanzeige B"]).write(to: url, atomically: true, encoding: .utf8)
-        let suite = "goals-show-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defaults.removePersistentDomain(forName: suite)
-        defer { defaults.removePersistentDomain(forName: suite) }
+        let defaults = MemoryDefaults()
 
         let engine = GoalsEngine(store: GoalStore(fileURL: url), settings: GoalSettings(defaults: defaults),
                                  timing: .init(interval: { _ in 3600 }, display: { _ in seconds }))
@@ -113,10 +110,7 @@ enum SelfTest {
         let url = dir.appendingPathComponent("goals.json")
         try? json(["Selbsttest A", "Selbsttest B", "Selbsttest C"]).write(to: url, atomically: true, encoding: .utf8)
 
-        let suite = "goals-selftest-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defaults.removePersistentDomain(forName: suite)
-        defer { defaults.removePersistentDomain(forName: suite) }
+        let defaults = MemoryDefaults()
 
         let store = GoalStore(fileURL: url)
         let settings = GoalSettings(defaults: defaults)
@@ -167,7 +161,7 @@ enum SelfTest {
         let leftScreen = spin(until: { gone(panel) }, timeout: settle)
         checks["vanishesAfterDisplay"] = vanished && abs(vanishedAt.timeIntervalSince(appeared) - 2.0) < 1.0 && leftScreen
 
-        // Zweite Runde: Der Takt läuft nach dem Verschwinden von selbst weiter, und die Karten kommen wieder ganz sichtbar.
+        // Zweite Runde: Der Takt läuft nach dem Verschwinden von selbst weiter, und die Zielanzeigen kommen wieder ganz sichtbar.
         checks["secondRoundAppears"] = spin(until: { overlay.isShown && onScreen(panel) && panel.alphaValue > 0.99 }, timeout: 1 + settle)
 
         // Schließen per Klick; lange Zeiten, damit nichts von selbst verschwindet
@@ -189,7 +183,7 @@ enum SelfTest {
             checks["closeOneByClick"] = false
         }
 
-        // Eine einzelne Karte und alle vier Breiten; die Größe ändert sich im laufenden Betrieb
+        // Eine einzelne Zielanzeige und alle vier Breiten; die Größe ändert sich im laufenden Betrieb
         let ids = store.cards.map(\.id)
         store.setEnabled(ids[1], false)
         store.setEnabled(ids[2], false)

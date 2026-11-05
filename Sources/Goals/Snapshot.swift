@@ -2,7 +2,7 @@ import AppKit
 import GoalsCore
 import SwiftUI
 
-/// `Goals --snapshot <ordner>`: rendert Karten und Einstellungsfenster als PNG, ohne Recht auf Bildschirmaufnahme.
+/// `Goals --snapshot <ordner>`: rendert Zielanzeigen und Einstellungsfenster als PNG, ohne Recht auf Bildschirmaufnahme.
 @MainActor
 enum Snapshot {
     private static let demoCards = [
@@ -17,7 +17,7 @@ enum Snapshot {
                  colors: CardColors(background: "#1C2B14", title: "#BDEB7A", text: "#EFF7E6")),
     ]
 
-    /// Für die Übersichten: sechs Karten, denn ab der siebten wiederholen sich die Verläufe.
+    /// Für die Übersichten: sechs Zielanzeigen, denn ab der siebten wiederholen sich die Verläufe.
     private static let galleryCards = demoCards + [
         GoalCard(id: "d", title: "Lernen", subtitle: "Eine Stunde am Tag",
                  detail: "Beispieltext: Was du bis zum Jahresende können willst."),
@@ -87,7 +87,7 @@ enum Snapshot {
         return renderer.nsImage
     }
 
-    /// Durchsichtiger Hintergrund und doppelte Auflösung, damit die Karten direkt auf der Seite liegen.
+    /// Durchsichtiger Hintergrund und doppelte Auflösung, damit die Zielanzeigen direkt auf der Seite liegen.
     private static func siteImage(cards: [GoalCard], columns: Int, mode: ColorMode, scheme: ColorSchemeKind) -> NSImage? {
         let width = CGFloat(columns) * (CardSize.small.width + CardLayout.spacing) + 2 * CardLayout.margin
         let model = overlayModel(cards: cards, size: .small, mode: mode, scheme: scheme, available: CGSize(width: width, height: 1800))
@@ -96,7 +96,7 @@ enum Snapshot {
         return renderer.nsImage
     }
 
-    /// Bilder der Projektseite: Karten je Sprache, das Einstellungsfenster hell und dunkel.
+    /// Bilder der Projektseite: Zielanzeigen je Sprache, das Einstellungsfenster hell und dunkel.
     private static func writeSiteImages(to directory: URL) -> Bool {
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         var ok = true
@@ -118,10 +118,7 @@ enum Snapshot {
         defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("goals.json")
         if let data = try? JSONEncoder().encode(GoalFile(cards: siteCards["de"] ?? [])) { try? data.write(to: url) }
-        let suite = "goals-snapshot-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defaults.removePersistentDomain(forName: suite)
-        defer { defaults.removePersistentDomain(forName: suite) }
+        let defaults = MemoryDefaults()
 
         let store = GoalStore(fileURL: url)
         store.load()
@@ -214,10 +211,7 @@ enum Snapshot {
         let url = dir.appendingPathComponent("goals.json")
         let encoder = JSONEncoder()
         if let data = try? encoder.encode(GoalFile(cards: demoCards)) { try? data.write(to: url) }
-        let suite = "goals-snapshot-\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defaults.removePersistentDomain(forName: suite)
-        defer { defaults.removePersistentDomain(forName: suite) }
+        let defaults = MemoryDefaults()
 
         let store = GoalStore(fileURL: url)
         store.load()

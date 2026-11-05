@@ -175,7 +175,7 @@ struct StoreTests {
         #expect(store.cards.count == 2)
     }
 
-    @Test("Eine Datei ohne Kartenliste gilt als kaputt und wird nicht überschrieben", arguments: ["{}", #"{"card":[{"title":"Tippfehler"}]}"#])
+    @Test("Eine Datei ohne Zielanzeigenliste gilt als kaputt und wird nicht überschrieben", arguments: ["{}", #"{"card":[{"title":"Tippfehler"}]}"#])
     func missingCardsIsBroken(text: String) throws {
         let url = try tempFile()
         try text.write(to: url, atomically: true, encoding: .utf8)

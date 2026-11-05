@@ -18,7 +18,7 @@ private final class DistributedObserver: NSObject {
     }
 }
 
-/// Verbindet Karten, Einstellungen, Takt und Overlay. Ein einziger Timer auf den nächsten Termin, sonst keine Arbeit.
+/// Verbindet Zielanzeigen, Einstellungen, Takt und Overlay. Ein einziger Timer auf den nächsten Termin, sonst keine Arbeit.
 @MainActor
 final class GoalsEngine: ObservableObject {
     /// Zeiten in Sekunden; der Selbsttest ersetzt sie durch kurze Werte.
@@ -74,7 +74,7 @@ final class GoalsEngine: ObservableObject {
         var remaining = overlay.model.visible
         remaining.remove(id)
         overlay.model.visible = remaining
-        // Karten, die nicht auf den Bildschirm passten, halten die Anzeige nicht offen.
+        // Zielanzeigen, die nicht auf den Bildschirm passten, halten die Anzeige nicht offen.
         if overlay.model.placedVisibleCount == 0 { scheduler.closeAll(now: Date()) }
         sync()
     }

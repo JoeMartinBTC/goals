@@ -24,7 +24,28 @@ public enum CardSize: String, CaseIterable, Identifiable {
     }
 }
 
-/// Einstellungen außer den Kartentexten, dauerhaft in UserDefaults.
+/// Einstellungen nur im Speicher, für Tests und Prüfmodi. Eine echte Ablage ließe eine Datei in den Preferences liegen,
+/// denn cfprefsd schreibt verzögert, auch noch nach dem Löschen. So entsteht gar keine Datei, und die echten Einstellungen bleiben unberührt.
+public final class MemoryDefaults: UserDefaults {
+    private var values: [String: Any] = [:]
+
+    public init() {
+        super.init(suiteName: "goals-im-speicher")!
+    }
+
+    public override func object(forKey defaultName: String) -> Any? { values[defaultName] }
+    public override func string(forKey defaultName: String) -> String? { values[defaultName] as? String }
+    public override func integer(forKey defaultName: String) -> Int { values[defaultName] as? Int ?? 0 }
+    public override func bool(forKey defaultName: String) -> Bool { values[defaultName] as? Bool ?? false }
+    public override func double(forKey defaultName: String) -> Double { values[defaultName] as? Double ?? 0 }
+    public override func set(_ value: Any?, forKey defaultName: String) { values[defaultName] = value }
+    public override func set(_ value: Int, forKey defaultName: String) { values[defaultName] = value }
+    public override func set(_ value: Bool, forKey defaultName: String) { values[defaultName] = value }
+    public override func set(_ value: Double, forKey defaultName: String) { values[defaultName] = value }
+    public override func removeObject(forKey defaultName: String) { values[defaultName] = nil }
+}
+
+/// Einstellungen außer den Zielanzeigentexten, dauerhaft in UserDefaults.
 public final class GoalSettings: ObservableObject {
     public static let displayOptions = [5, 10, 15, 30]
     public static let intervalOptions = [1, 15, 30, 60, 120, 240]
@@ -60,7 +81,7 @@ public final class GoalSettings: ObservableObject {
     @Published public var scheme: ColorSchemeKind {
         didSet { defaults.set(scheme.rawValue, forKey: "scheme"); onChange?() }
     }
-    /// Versatz der Kartengruppe gegenüber der Mitte des Hauptbildschirms.
+    /// Versatz der Zielanzeigengruppe gegenüber der Mitte des Hauptbildschirms.
     @Published public var positionOffset: CGSize {
         didSet {
             defaults.set(Double(positionOffset.width), forKey: "positionX")

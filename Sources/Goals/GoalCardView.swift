@@ -32,7 +32,7 @@ extension CardSize {
     }
 }
 
-/// Eine Goal-Karte. Ohne `height` bestimmt der Text die Höhe.
+/// Eine Goal-Zielanzeige. Ohne `height` bestimmt der Text die Höhe.
 struct GoalCardView: View {
     let card: GoalCard
     let palette: CardPalette
@@ -116,7 +116,7 @@ final class OverlayModel: ObservableObject {
     @Published var entries: [String: Entry] = [:]
     @Published var visible: Set<String> = []
 
-    /// Sichtbare Karten, die auch wirklich auf den Bildschirm passen.
+    /// Sichtbare Zielanzeigen, die auch wirklich auf den Bildschirm passen.
     var placedVisible: Set<String> {
         Set(layout?.placements.map(\.id) ?? []).intersection(visible)
     }

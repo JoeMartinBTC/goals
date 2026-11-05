@@ -1,6 +1,6 @@
 import Foundation
 
-/// Hält die Karten und gleicht sie mit `goals.json` ab. Nur auf dem Haupt-Thread benutzen.
+/// Hält die Zielanzeigen und gleicht sie mit `goals.json` ab. Nur auf dem Haupt-Thread benutzen.
 public final class GoalStore: ObservableObject {
     public let fileURL: URL
     @Published public private(set) var cards: [GoalCard] = []

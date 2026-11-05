@@ -1,6 +1,6 @@
 import Foundation
 
-/// Eigene Farben einer Karte als Hex-Text, damit `goals.json` von Hand lesbar bleibt.
+/// Eigene Farben einer Zielanzeige als Hex-Text, damit `goals.json` von Hand lesbar bleibt.
 public struct CardColors: Codable, Equatable {
     public var background: String
     public var title: String
@@ -13,7 +13,7 @@ public struct CardColors: Codable, Equatable {
     }
 }
 
-/// Eine Goal-Karte: Überschrift, Unterüberschrift, Erklärung, einzeln abschaltbar.
+/// Eine Goal-Zielanzeige: Überschrift, Unterüberschrift, Erklärung, einzeln abschaltbar.
 public struct GoalCard: Codable, Equatable, Identifiable {
     public var id: String
     public var title: String
@@ -39,7 +39,7 @@ public struct GoalCard: Codable, Equatable, Identifiable {
 }
 
 extension GoalCard {
-    // Synthetisiertes Decodable ignoriert Standardwerte; von Hand geschriebene Karten dürfen Schlüssel weglassen.
+    // Synthetisiertes Decodable ignoriert Standardwerte; von Hand geschriebene Zielanzeigen dürfen Schlüssel weglassen.
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decodeIfPresent(String.self, forKey: .id) ?? ""

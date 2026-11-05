@@ -13,14 +13,14 @@ struct SchedulerTests {
         return s
     }
 
-    @Test("Ohne eingeschaltete Karte läuft kein Takt")
+    @Test("Ohne eingeschaltete Zielanzeige läuft kein Takt")
     func idleWithoutCards() {
         let s = scheduler(cards: [])
         #expect(s.phase == .idle)
         #expect(s.nextFire == nil)
     }
 
-    @Test("Die erste eingeschaltete Karte startet den Takt")
+    @Test("Die erste eingeschaltete Zielanzeige startet den Takt")
     func firstCardStartsInterval() {
         #expect(scheduler().phase == .waiting(until: t0.addingTimeInterval(600)))
     }
@@ -32,7 +32,7 @@ struct SchedulerTests {
         #expect(s.visibleIDs.isEmpty)
     }
 
-    @Test("Am Termin erscheinen alle aktiven Karten gemeinsam")
+    @Test("Am Termin erscheinen alle aktiven Zielanzeigen gemeinsam")
     func showsAtDue() {
         var s = scheduler()
         s.advance(now: t0.addingTimeInterval(600))
@@ -40,7 +40,7 @@ struct SchedulerTests {
         #expect(s.phase == .showing(until: t0.addingTimeInterval(615)))
     }
 
-    @Test("Karten verschwinden nach der Anzeigedauer, der Takt zählt ab dort")
+    @Test("Zielanzeigen verschwinden nach der Anzeigedauer, der Takt zählt ab dort")
     func vanishesAndCountsFromVanish() {
         var s = scheduler()
         s.advance(now: t0.addingTimeInterval(600))
@@ -77,7 +77,7 @@ struct SchedulerTests {
         #expect(s.visibleIDs == ["a", "b"])
     }
 
-    @Test("Eine geschlossene Karte geht, die andere bleibt")
+    @Test("Eine geschlossene Zielanzeige geht, die andere bleibt")
     func closeOneKeepsOther() {
         var s = scheduler()
         s.advance(now: t0.addingTimeInterval(600))
@@ -85,7 +85,7 @@ struct SchedulerTests {
         #expect(s.visibleIDs == ["b"])
     }
 
-    @Test("Schließen der letzten Karte beendet die Anzeige, der Takt zählt ab dem Schließen")
+    @Test("Schließen der letzten Zielanzeige beendet die Anzeige, der Takt zählt ab dem Schließen")
     func closeLastCountsFromClose() {
         var s = scheduler()
         s.advance(now: t0.addingTimeInterval(600))
@@ -105,7 +105,7 @@ struct SchedulerTests {
         #expect(s.phase == .waiting(until: at.addingTimeInterval(600)))
     }
 
-    @Test("Eine geschlossene Karte kommt beim nächsten Mal wieder")
+    @Test("Eine geschlossene Zielanzeige kommt beim nächsten Mal wieder")
     func closedCardReturns() {
         var s = scheduler()
         s.advance(now: t0.addingTimeInterval(600))
@@ -115,7 +115,7 @@ struct SchedulerTests {
         #expect(s.visibleIDs == ["a", "b"])
     }
 
-    @Test("Schaltet man alle Karten ab, endet die Anzeige und der Takt ruht")
+    @Test("Schaltet man alle Zielanzeigen ab, endet die Anzeige und der Takt ruht")
     func disablingAllGoesIdle() {
         var s = scheduler()
         s.advance(now: t0.addingTimeInterval(600))
@@ -123,7 +123,7 @@ struct SchedulerTests {
         #expect(s.phase == .idle)
     }
 
-    @Test("Schaltet man eine sichtbare Karte ab, bleibt die andere")
+    @Test("Schaltet man eine sichtbare Zielanzeige ab, bleibt die andere")
     func disablingOneKeepsOther() {
         var s = scheduler()
         s.advance(now: t0.addingTimeInterval(600))
@@ -139,7 +139,7 @@ struct SchedulerTests {
         #expect(s.phase == .showing(until: t0.addingTimeInterval(25)))
     }
 
-    @Test("Jetzt zeigen ohne Karte tut nichts")
+    @Test("Jetzt zeigen ohne Zielanzeige tut nichts")
     func showNowWithoutCards() {
         var s = scheduler(cards: [])
         s.showNow(now: t0)

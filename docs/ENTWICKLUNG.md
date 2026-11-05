@@ -61,6 +61,7 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die Z
 - **Verlauf über die ganze Fläche:** Die vier Flächen-Schemen laufen im Rechteck um alle Zielanzeigen (`OverlayLayout.cardsBounds`). `CardGradient.section` rechnet die beiden Punkte in die Fläche der einzelnen Zielanzeige um, die Punkte dürfen dabei außerhalb von 0 bis 1 liegen. So teilen alle Zielanzeigen dieselbe Achse, und der Verlauf läuft über die Lücken hinweg weiter. Die Lücken selbst bleiben durchsichtig. Eine Zielanzeige allein zeigt den ganzen Verlauf.
 - **Lesbarkeit:** Ein Test prüft Überschrift, Unterzeile und Text gegen zehn Stufen je Abschnitt jedes Verlaufs, mindestens 4,5 : 1. Ein Flächen-Schema hat deshalb durchgehend helle oder durchgehend dunkle Farben, denn jede Zielanzeige kann jeden Abschnitt zeigen.
 - **Wörter:** Oberfläche und Doku sagen „Zielanzeige“ und „die Goal-App“, Code und Datei sagen weiter `card` (`GoalCard`, Schlüssel `cards`). So bleiben vorhandene `goals.json`-Dateien gültig.
+- **Einstellungen in Tests und Prüfmodi:** `MemoryDefaults` hält sie nur im Speicher. Eine echte Wegwerf-Ablage hinterlässt Dateien in den Preferences, auch mit `removePersistentDomain` und anschließendem Löschen, denn `cfprefsd` schreibt verzögert.
 - **Hauptbildschirm:** `NSScreen.screens.first`, nicht `NSScreen.main`. Letzteres ist der Bildschirm mit dem aktiven Fenster.
 - **Takt ab dem Verschwinden:** Auch das Schließen der letzten Zielanzeige startet die Wartezeit. Ein neuer Takt gilt ab jetzt, eine neue Anzeigedauer auch für die laufende Anzeige.
 - **Kaputte Datei:** `GoalStore` sperrt dann jede Änderung und schreibt nichts. Fehlt die Datei im Betrieb, schreibt die Goal-App den letzten guten Stand zurück und hebt die Sperre auf. Eine Datei ohne `cards` gilt als kaputt.
@@ -77,7 +78,7 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die Z
 
 ## Was geprüft wird
 
-`swift test` führt die Tests von `GoalsCore` aus: 82 Tests in den Gruppen Ablage, Einstellungen, Farben, Raster, Takt und Zeitangaben. Sie brauchen keinen Bildschirm.
+`swift test` führt die Tests von `GoalsCore` aus: 83 Tests in den Gruppen Ablage, Einstellungen, Farben, Raster, Takt und Zeitangaben. Sie brauchen keinen Bildschirm.
 
 `--selftest` endet mit Exit 0, wenn alles grün ist, mit 1 bei einem Fehler und mit 2 bei gesperrtem Bildschirm. Fehlt eine Prüfung im Ergebnis, zählt sie als gescheitert. Das sind die 30 Prüfungen:
 

@@ -64,7 +64,7 @@ final class OverlayController {
         NSScreen.screens.first?.visibleFrame ?? CGRect(x: 0, y: 0, width: 1440, height: 900)
     }
 
-    /// Zeigt die sichtbaren Karten. Neu gerechnet wird nur bei geändertem Inhalt: Schließt man eine Karte,
+    /// Zeigt die sichtbaren Zielanzeigen. Neu gerechnet wird nur bei geändertem Inhalt: Schließt man eine Zielanzeige,
     /// bleiben die anderen stehen, damit das nächste X nicht wegspringt.
     func show(cards: [GoalCard], visible: Set<String>) {
         var entries: [String: OverlayModel.Entry] = [:]

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Wann Karten erscheinen und verschwinden. Reine Logik ohne Uhr und Timer: Die Zeit kommt von außen,
+/// Wann Zielanzeigen erscheinen und verschwinden. Reine Logik ohne Uhr und Timer: Die Zeit kommt von außen,
 /// die App stellt einen einzigen Timer auf `nextFire` und ruft dann `advance`.
 public struct ReminderScheduler {
     public enum Phase: Equatable {
@@ -51,7 +51,7 @@ public struct ReminderScheduler {
 
     public func isSuspended(_ reason: SuspendReason) -> Bool { suspensions.contains(reason) }
 
-    /// Karten, die gerade auf dem Bildschirm stehen, in der Reihenfolge der Liste.
+    /// Zielanzeigen, die gerade auf dem Bildschirm stehen, in der Reihenfolge der Liste.
     public var visibleIDs: [String] {
         guard isShowing else { return [] }
         return enabledIDs.filter { !closedIDs.contains($0) }

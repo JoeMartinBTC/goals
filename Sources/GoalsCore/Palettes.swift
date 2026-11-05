@@ -12,9 +12,9 @@ public enum ColorSchemeKind: String, CaseIterable, Identifiable {
     case morgenrot, lagune, polarlicht, abendrot
     case eigene
 
-    /// Jede Karte zeigt ihren eigenen Verlauf.
+    /// Jede Zielanzeige zeigt ihren eigenen Verlauf.
     public static let perCard: [ColorSchemeKind] = [.metall, .signal, .pastell, .nacht, .fest, .minze, .himmel, .glut]
-    /// Ein einziger Verlauf läuft über alle Karten zusammen.
+    /// Ein einziger Verlauf läuft über alle Zielanzeigen zusammen.
     public static let wholeArea: [ColorSchemeKind] = [.morgenrot, .lagune, .polarlicht, .abendrot]
 
     public var id: String { rawValue }
@@ -37,12 +37,12 @@ public enum ColorSchemeKind: String, CaseIterable, Identifiable {
     }
 }
 
-/// Farbverlauf einer Karte. `start` und `end` sind Anteile der Kartenfläche, (0, 0) liegt oben links.
+/// Farbverlauf einer Zielanzeige. `start` und `end` sind Anteile der Zielanzeigenfläche, (0, 0) liegt oben links.
 public struct CardGradient: Equatable {
     public var colors: [UInt32]
     public var start: CGPoint
     public var end: CGPoint
-    /// Läuft über alle Karten zusammen statt über jede einzeln.
+    /// Läuft über alle Zielanzeigen zusammen statt über jede einzeln.
     public var spansCards: Bool
 
     /// Der Winkel zählt wie in CSS: 0 läuft nach oben, 90 nach rechts, 180 nach unten.
@@ -56,7 +56,7 @@ public struct CardGradient: Equatable {
         self.spansCards = spansCards
     }
 
-    /// Der Ausschnitt, den eine Karte zeigt, wenn der Verlauf über `bounds` läuft. Alle Karten behalten dieselbe Achse.
+    /// Der Ausschnitt, den eine Zielanzeige zeigt, wenn der Verlauf über `bounds` läuft. Alle Zielanzeigen behalten dieselbe Achse.
     public func section(tile: CGRect, bounds: CGRect) -> CardGradient {
         func project(_ p: CGPoint) -> CGPoint {
             CGPoint(x: (bounds.minX + p.x * bounds.width - tile.minX) / tile.width,
@@ -87,7 +87,7 @@ public struct CardPalette: Equatable {
         self.gradient = gradient
     }
 
-    /// Die Palette, wie sie eine Karte an dieser Stelle zeigt.
+    /// Die Palette, wie sie eine Zielanzeige an dieser Stelle zeigt.
     public func placed(tile: CGRect, bounds: CGRect) -> CardPalette {
         guard let gradient, gradient.spansCards else { return self }
         var placed = self
@@ -218,7 +218,7 @@ public enum Palettes {
         }
     }
 
-    /// Eine Karte ohne eigene Farben, oder mit ungültigen Angaben, zeigt die Farben der Uhr.
+    /// Eine Zielanzeige ohne eigene Farben, oder mit ungültigen Angaben, zeigt die Farben der Uhr.
     static func customPalette(_ custom: CardColors?) -> CardPalette {
         guard let custom else { return mono }
         let title = parseHex(custom.title) ?? mono.title

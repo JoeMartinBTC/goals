@@ -6,16 +6,16 @@ public struct CardPlacement: Equatable, Identifiable {
     public var closeRect: CGRect
 }
 
-/// Lage aller Karten im Overlay. Koordinaten: Ursprung oben links, y wächst nach unten.
+/// Lage aller Zielanzeigen im Overlay. Koordinaten: Ursprung oben links, y wächst nach unten.
 public struct OverlayLayout: Equatable {
     public var size: CardSize
     public var canvas: CGSize
     public var placements: [CardPlacement]
     public var closeAllRect: CGRect?
-    /// Karten, die selbst in der kleinsten Größe nicht mehr auf den Bildschirm passen.
+    /// Zielanzeigen, die selbst in der kleinsten Größe nicht mehr auf den Bildschirm passen.
     public var hiddenCount: Int
 
-    /// Rechteck um alle Karten. Ein Verlauf über die ganze Fläche läuft darin.
+    /// Rechteck um alle Zielanzeigen. Ein Verlauf über die ganze Fläche läuft darin.
     public var cardsBounds: CGRect {
         placements.reduce(CGRect.null) { $0.union($1.frame) }
     }
@@ -36,7 +36,7 @@ public enum CardLayout {
     public static let closeSize: CGFloat = 34
     public static let closeAllSize = CGSize(width: 160, height: 34)
 
-    /// Bis drei Karten in einer Reihe, danach möglichst quadratisch.
+    /// Bis drei Zielanzeigen in einer Reihe, danach möglichst quadratisch.
     public static func preferredColumns(_ count: Int) -> Int {
         count <= 3 ? max(count, 1) : Int(Double(count).squareRoot().rounded(.up))
     }
@@ -47,7 +47,7 @@ public enum CardLayout {
         for size in sizes {
             if let layout = arrange(ids: ids, hidden: 0, size: size, available: available, height: height) { return layout }
         }
-        // Selbst die kleinste Größe passt nicht: von hinten Karten weglassen und die Zahl nennen.
+        // Selbst die kleinste Größe passt nicht: von hinten Zielanzeigen weglassen und die Zahl nennen.
         let smallest = sizes.last ?? .small
         var count = ids.count - 1
         while count >= 1 {
@@ -65,7 +65,7 @@ public enum CardLayout {
             return OverlayLayout(size: size, canvas: .zero, placements: [], closeAllRect: nil, hiddenCount: hidden)
         }
         let maxColumns = Int((available.width - 2 * margin + spacing) / (size.width + spacing))
-        // Passt nur eine Karte hinein und diese nicht in der Breite, bleibt die kleinste Größe als letzter Halt.
+        // Passt nur eine Zielanzeige hinein und diese nicht in der Breite, bleibt die kleinste Größe als letzter Halt.
         guard maxColumns >= 1 else { return nil }
         let start = min(preferredColumns(ids.count), maxColumns)
         for columns in start...max(start, maxColumns) {
@@ -111,7 +111,7 @@ public enum CardLayout {
                              closeAllRect: closeAll, hiddenCount: hidden)
     }
 
-    /// Was unter einem Klick liegt. Eine geschlossene Karte zählt nicht mehr.
+    /// Was unter einem Klick liegt. Eine geschlossene Zielanzeige zählt nicht mehr.
     public static func hit(_ point: CGPoint, in layout: OverlayLayout, visible: Set<String>) -> OverlayHit {
         if visible.count >= 2, let all = layout.closeAllRect, all.contains(point) { return .closeAll }
         for placement in layout.placements where visible.contains(placement.id) {

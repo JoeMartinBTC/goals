@@ -39,7 +39,7 @@ private final class ActionItem: NSMenuItem {
     @objc private func run() { handler?() }
 }
 
-/// Dasselbe Menü für Menüleiste, Dock und Rechtsklick auf eine Karte.
+/// Dasselbe Menü für Menüleiste, Dock und Rechtsklick auf eine Zielanzeige.
 @MainActor
 final class GoalsMenu: NSObject, NSMenuDelegate {
     private let engine: GoalsEngine
