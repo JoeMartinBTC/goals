@@ -6,6 +6,7 @@
 - Vier neue Schemen mit einem einzigen Verlauf über alle Karten: Morgenrot, Lagune, Polarlicht, Abendrot.
 - Menü und Einstellungsfenster zeigen die Schemen in zwei Gruppen. Im Einstellungsfenster ist „Schema“ jetzt eine Auswahlliste.
 - Einfarbig und Eigene bleiben ohne Verlauf.
+- `--snapshot` schreibt zusätzlich zwei Übersichten aller Schemen mit je sechs Karten.
 
 ## 1.0.0 (2026-11-04)
 

@@ -28,6 +28,20 @@ Das Symbol in der Menüleiste, das Dock-Symbol und der Rechtsklick auf eine Kart
 
 Ab Werk gilt: Größe „Mittel“ (480 pt), 15 Sekunden Anzeigedauer, Takt 1 Stunde ohne Streuung, einfarbig. Ein eigener Takt darf zwischen 1 Minute und 24 Stunden liegen.
 
+## Farben
+
+Die Farbe wählst du im Menü unter „Farbe“ oder im Einstellungsfenster im Bereich „Anzeige“.
+
+**Verlauf je Karte:** Jedes dieser acht Schemen hat sechs verschiedene Verläufe, ab der siebten Karte wiederholen sie sich.
+
+![Die acht Schemen mit einem Verlauf je Karte](docs/galerie-je-karte.png)
+
+**Verlauf über die ganze Fläche:** Diese vier Schemen legen einen einzigen Verlauf über alle Karten. Jede Karte zeigt ihren Ausschnitt, die Lücken zwischen den Karten bleiben durchsichtig. Eine Karte allein zeigt den ganzen Verlauf.
+
+![Die vier Schemen mit einem Verlauf über die ganze Fläche](docs/galerie-flaeche.png)
+
+**Eigene:** Hintergrund, Überschrift und Text stellst du je Karte im Bereich „Karten“ ein. Diese Karten und die einfarbige Darstellung haben keinen Verlauf.
+
 ## Die Datei
 
 Die Karten liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Änderungen von außen wirken sofort, auch von Editoren, die atomar speichern. Treffen sie auf eine ungespeicherte Eingabe in der App, gewinnt die Datei. Eine Datei, die nicht lesbar ist, bleibt unangetastet: Die App meldet das und speichert nichts, bis sie wieder lesbar ist. Löschst du sie, schreibt die App den letzten guten Stand zurück.

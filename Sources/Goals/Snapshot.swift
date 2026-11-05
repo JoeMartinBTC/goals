@@ -17,25 +17,65 @@ enum Snapshot {
                  colors: CardColors(background: "#1C2B14", title: "#BDEB7A", text: "#EFF7E6")),
     ]
 
+    /// Für die Übersichten: sechs Karten, denn ab der siebten wiederholen sich die Verläufe.
+    private static let galleryCards = demoCards + [
+        GoalCard(id: "d", title: "Lernen", subtitle: "Eine Stunde am Tag",
+                 detail: "Beispieltext: Was du bis zum Jahresende können willst."),
+        GoalCard(id: "e", title: "Freunde", subtitle: "Einmal im Monat treffen",
+                 detail: "Beispieltext: Wer dir wichtig ist und wann ihr euch seht."),
+        GoalCard(id: "f", title: "Rücklage", subtitle: "Sechs Monatsausgaben",
+                 detail: "Beispieltext: Welche Zahl am Monatsende stimmen soll."),
+    ]
+
     private static func write(_ image: NSImage?, _ url: URL) -> Bool {
         guard let tiff = image?.tiffRepresentation,
               let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) else { return false }
         return (try? png.write(to: url)) != nil
     }
 
-    private static func cardsImage(size: CardSize, mode: ColorMode, scheme: ColorSchemeKind) -> NSImage? {
+    private static func overlayModel(cards: [GoalCard], size: CardSize, mode: ColorMode, scheme: ColorSchemeKind) -> OverlayModel {
         let model = OverlayModel()
         var entries: [String: OverlayModel.Entry] = [:]
-        for (index, card) in demoCards.enumerated() {
+        for (index, card) in cards.enumerated() {
             entries[card.id] = .init(card: card, palette: Palettes.palette(index: index, mode: mode, scheme: scheme, custom: card.colors))
         }
         model.entries = entries
-        model.visible = Set(demoCards.map(\.id))
-        let byID = Dictionary(uniqueKeysWithValues: demoCards.map { ($0.id, $0) })
-        model.layout = CardLayout.fit(ids: demoCards.map(\.id), preferred: size, available: CGSize(width: 3200, height: 1800)) { id, s in
+        model.visible = Set(cards.map(\.id))
+        let byID = Dictionary(uniqueKeysWithValues: cards.map { ($0.id, $0) })
+        model.layout = CardLayout.fit(ids: cards.map(\.id), preferred: size, available: CGSize(width: 3200, height: 1800)) { id, s in
             byID[id].map { CardMeasure.height(of: $0, size: s) } ?? 0
         }
-        let renderer = ImageRenderer(content: OverlayContentView(model: model))
+        return model
+    }
+
+    private static func cardsImage(size: CardSize, mode: ColorMode, scheme: ColorSchemeKind) -> NSImage? {
+        let renderer = ImageRenderer(content: OverlayContentView(model: overlayModel(cards: demoCards, size: size, mode: mode, scheme: scheme)))
+        renderer.scale = 1
+        return renderer.nsImage
+    }
+
+    /// Übersicht für die Doku: je Schema alle Verläufe, in zwei Spalten.
+    private static func galleryImage(_ schemes: [ColorSchemeKind]) -> NSImage? {
+        func column(_ schemes: ArraySlice<ColorSchemeKind>) -> some View {
+            VStack(alignment: .leading, spacing: 16) {
+                ForEach(Array(schemes)) { scheme in
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(scheme.title)
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .padding(.leading, CardLayout.margin)
+                        OverlayContentView(model: overlayModel(cards: galleryCards, size: .small, mode: .color, scheme: scheme))
+                    }
+                }
+            }
+        }
+        let half = schemes.count / 2
+        let renderer = ImageRenderer(content: HStack(alignment: .top, spacing: 16) {
+            column(schemes[..<half])
+            column(schemes[half...])
+        }
+        .padding(16)
+        .background(Color(hex: 0x5A5A5A)))
         renderer.scale = 1
         return renderer.nsImage
     }
@@ -76,6 +116,9 @@ enum Snapshot {
                            directory.appendingPathComponent("karten-\(size.rawValue)-\(scheme.rawValue).png")) && ok
             }
         }
+
+        ok = write(galleryImage(ColorSchemeKind.perCard), directory.appendingPathComponent("galerie-je-karte.png")) && ok
+        ok = write(galleryImage(ColorSchemeKind.wholeArea), directory.appendingPathComponent("galerie-flaeche.png")) && ok
 
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("goals-snapshot-\(UUID().uuidString)")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

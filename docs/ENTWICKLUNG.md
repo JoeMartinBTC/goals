@@ -9,12 +9,20 @@ Swift Package ohne Xcode-Projekt. Das Bundle baut `Scripts/build_local_app.sh`.
 | `GoalsCore` | `GoalCard.swift`, `GoalStore.swift`, `FileWatcher.swift` | Karten, `goals.json`, Beobachtung des Pfads |
 | | `ReminderScheduler.swift` | Takt als reine Logik: Die Zeit kommt von außen, keine Timer |
 | | `CardLayout.swift` | Raster, Klickziele, Position als reine Rechnung |
-| | `Palettes.swift`, `GoalSettings.swift`, `TimeText.swift` | Farben, Einstellungen, Zeitangaben |
+| | `Palettes.swift`, `GoalSettings.swift`, `TimeText.swift` | Farben und Verläufe, Einstellungen, Zeitangaben |
 | `Goals` | `GoalsEngine.swift` | Verbindet alles, ein einziger Timer auf den nächsten Termin |
 | | `OverlayController.swift` | Fenster, Einblenden, Klicks |
 | | `GoalCardView.swift` | Karte und Overlay-Inhalt, rein darstellend |
 | | `GoalsMenu.swift`, `SettingsView.swift`, `AppDelegate.swift` | Menü, Einstellungsfenster, App |
 | | `SelfTest.swift`, `Snapshot.swift` | Prüf-Startmodi |
+
+## Neues Farbschema ergänzen
+
+1. Trage in `ColorSchemeKind` in `Palettes.swift` den Fall und seinen Titel ein. Der Compiler verlangt den Fall danach auch in `Palettes.palette`.
+2. Trage den Fall in `perCard` oder `wholeArea` ein. Nur diese Listen füllen Menü, Einstellungsfenster und Übersichten.
+3. Lege die Farben an. Ein Schema je Karte braucht sechs Paletten, ein Flächen-Schema eine Palette mit `spansCards: true`.
+4. Passe die Anzahlen im Test `schemeCounts` an und starte `swift test`. Der Test `contrastIsReadable` meldet jede Schrift unter 4,5 : 1.
+5. Starte `--snapshot` und sieh dir `galerie-je-karte.png` oder `galerie-flaeche.png` an.
 
 ## Bauen
 
@@ -63,7 +71,7 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die K
 
 - `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Sichtbarkeit fragt er beim Fensterdienst ab und gibt ihm bis zu zwei Sekunden Zeit, damit eine ausgelastete Maschine kein falsches Rot ergibt. `frontmostUnchanged` wird nur rot, wenn der Selbsttest selbst nach vorn kommt; ein Wechsel zwischen anderen Programmen zählt nicht. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Die Sperre ruft er direkt auf, die echten Systemmeldungen laufen nicht mit. Nutzt eine Wegwerf-Datei und Wegwerf-Einstellungen.
 - `--autostart-status`: nennt den Stand des Anmeldeobjekts.
-- `--snapshot <ordner>`: 56 Bilder der Karten (vier Größen, 14 Farbdarstellungen) und zwei des Einstellungsfensters. Die Karten rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
+- `--snapshot <ordner>`: 56 Bilder der Karten (vier Größen, 14 Farbdarstellungen), zwei des Einstellungsfensters und zwei Übersichten aller Schemen mit je sechs Karten (`galerie-je-karte.png`, `galerie-flaeche.png`). Die Bilder unter `docs/` stammen aus diesem Lauf: `karten-farbig.png` ist `karten-medium-fest.png`, `karten-flaeche.png` ist `karten-medium-morgenrot.png`. Die Karten rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
 - `--show-for <sekunden> [--allow-capture]`: zeigt zwei Prüfkarten und nennt ihr Rechteck. So lässt sich die Aufzeichnungs-Sperre von außen prüfen.
 
 ## Was geprüft wird
@@ -82,8 +90,9 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die K
 | Sperre | `sessionLockReadable`, `noTimerWhileLocked`, `lockedShowsNothing`, `unlockShowsOverdue` |
 | Datei | `externalReplace`, `externalInPlace`, `brokenFileUntouched`, `brokenFileRecovers`, `realFileUntouched` |
 
-Diese vier Punkte prüft nur ein Mensch:
+Diese fünf Punkte prüft nur ein Mensch:
 
+- Die Auswahlliste „Schema“ aufklappen, denn SwiftUI füllt ihr Menü erst beim Öffnen.
 - Der Klick auf X und „Alle schließen“ mit der echten Maus.
 - Das Weitertippen in einem Programm, während die Karten erscheinen.
 - Eine echte Bildschirmaufnahme, denn `sharingFlagNone` prüft nur die Markierung des Fensters.
