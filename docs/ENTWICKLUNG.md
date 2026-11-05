@@ -51,6 +51,16 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die Z
 | `positionX`, `positionY` | Versatz gegen die Mitte des Hauptbildschirms | 0 |
 | `autostartInitialized` | merkt sich den einmaligen Eintrag als Anmeldeobjekt | fehlt |
 
+Menü und Einstellungsfenster wirken sofort. Von außen geht es auch, aber die Goal-App liest die Werte nur beim Start und beobachtet sie danach nicht. `defaults write` wirkt deshalb erst nach dem Beenden und einem neuen Start:
+
+```bash
+defaults write com.joemartinbtc.Goals intervalMinutes -int 15
+defaults write com.joemartinbtc.Goals jitter -bool true
+defaults write com.joemartinbtc.Goals displaySeconds -int 30
+```
+
+Ein Wert außerhalb der Tabelle fällt beim Start auf den Wert ab Werk zurück.
+
 ## Entscheidungen
 
 - **Fenster:** `NSPanel` mit `.nonactivatingPanel`, `canBecomeKey == false`, Ebene `.statusBar`, `collectionBehavior` mit `.canJoinAllSpaces` und `.fullScreenAuxiliary`. So liegt es auch über Vollbild-Apps, obwohl Goals eine normale Dock-App ist.
@@ -71,7 +81,7 @@ Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die Z
 
 ## Prüf-Startmodi
 
-- `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Sichtbarkeit fragt er beim Fensterdienst ab und gibt ihm bis zu zwei Sekunden Zeit, damit eine ausgelastete Maschine kein falsches Rot ergibt. `frontmostUnchanged` wird nur rot, wenn der Selbsttest selbst nach vorn kommt; ein Wechsel zwischen anderen Programmen zählt nicht. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Die Sperre ruft er direkt auf, die echten Systemmeldungen laufen nicht mit. Nutzt eine Wegwerf-Datei und Wegwerf-Einstellungen.
+- `--selftest`: Takt, Anzeigedauer, Klicks, vier Breiten, Datei von außen, kaputte Datei, Sperre, Fensterflags. Sichtbarkeit fragt er beim Fensterdienst ab und gibt ihm bis zu zwei Sekunden Zeit, damit eine ausgelastete Maschine kein falsches Rot ergibt. `frontmostUnchanged` wird nur rot, wenn der Selbsttest selbst nach vorn kommt; ein Wechsel zwischen anderen Programmen zählt nicht. Klicks gehen direkt per `sendEvent` an das Fenster, weil Klicks von außen Bedienungshilfen-Rechte brauchen. Die Sperre ruft er direkt auf, die echten Systemmeldungen laufen nicht mit. Er nutzt eine Wegwerf-Datei und hält die Einstellungen mit `MemoryDefaults` nur im Speicher.
 - `--autostart-status`: nennt den Stand des Anmeldeobjekts.
 - `--snapshot <ordner>`: 56 Bilder der Zielanzeigen (vier Größen, 14 Farbdarstellungen), zwei des Einstellungsfensters und zwei Übersichten aller Schemen mit je sechs Zielanzeigen (`galerie-je-karte.png`, `galerie-flaeche.png`). Die Bilder unter `docs/` stammen aus diesem Lauf: `karten-farbig.png` ist `karten-medium-fest.png`, `karten-flaeche.png` ist `karten-medium-morgenrot.png`. Die Zielanzeigen rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente. Der Unterordner `seite/` enthält 16 Bilder für die Projektseite: die sechs Beispielziele auf Deutsch und Englisch mit durchsichtigem Hintergrund und das Einstellungsfenster hell und dunkel, alle in doppelter Auflösung. Dem Einstellungsfenster fehlt der eigene Hintergrund, die Fensterfarbe kommt beim Umwandeln dazu.
 - `--show-for <sekunden> [--allow-capture]`: zeigt zwei Prüfanzeigen und nennt ihr Rechteck. So lässt sich die Aufzeichnungs-Sperre von außen prüfen.
@@ -111,3 +121,6 @@ Diese fünf Punkte prüft nur ein Mensch:
 - Prüfen im Vollbild: Ein Hilfsprogramm geht mit eigenem Fenster per `toggleFullScreen` in den Vollbildmodus und startet dort `--selftest`. Die Prüfung `listedOnCurrentSpace` zeigt dann, ob das Overlay auf dem Vollbild-Space liegt.
 - Ein Byte-Vergleich von `--snapshot` über zwei Builds taugt nicht. Beim Schritt auf 1.1.0 wichen die Bilder von Einfarbig und Eigene um höchstens 2 von 255 Stufen ab, nur das erste Bild des Laufs war gleich. Zwei Läufe desselben Builds sind Byte für Byte gleich. Vergleiche über Builds hinweg brauchen eine Schwelle.
 - Ob eine Aufzeichnung die Zielanzeigen wirklich auslässt, zeigt nur ein echter Versuch: `--show-for 15` starten und ein Bildschirmfoto machen. Das braucht das Recht auf Bildschirmaufnahme.
+- In einer Prozess-Sandbox, etwa der eines Agenten-Werkzeugs, stürzt `--selftest` mit Exit 133 ab (`sandbox_extension_issue_file_to_process failed`, `Operation not permitted`). Er darf dort nicht ins Temp-Verzeichnis schreiben und erreicht Systemdienste nicht. Das sagt nichts über die Goal-App, der Lauf gehört außerhalb der Sandbox.
+- Jede Installation und jeder Neustart setzt die Wartezeit bis zur nächsten Anzeige zurück, denn die Goal-App speichert keinen Termin. Wer den Takt von Hand beobachtet, muss das einrechnen, auch nach `Scripts/build_local_app.sh`.
+- Nach einer Wort-Ersetzung über die ganze Doku alle Sätze lesen, die beide Wörter nennen. Die Umstellung auf „Zielanzeige“ machte aus der CHANGELOG-Zeile über das alte Wort zunächst einen Satz ohne Sinn.

@@ -31,7 +31,9 @@ bash Scripts/build_local_app.sh
 /Applications/Goals.app/Contents/MacOS/Goals --snapshot <ordner>
 ```
 
-`swift`, `gh` und Schreibzugriffe auf `.git` laufen nicht in der Bash-Sandbox. `--selftest` ist nur aus dem installierten App-Paket aussagekräftig, ein Lauf aus `.build` sagt nichts über die App.
+`swift`, `gh`, `--selftest` und Schreibzugriffe auf `.git` laufen nicht in der Bash-Sandbox. `--selftest` ist nur aus dem installierten App-Paket aussagekräftig, ein Lauf aus `.build` sagt nichts über die App.
+
+Die Einstellungen liest die Goal-App nur beim Start. Ein `defaults write` an der laufenden Goal-App wirkt erst nach einem Neustart, und der setzt die Wartezeit zurück.
 
 ## Mehr
 
