@@ -16,6 +16,33 @@ Swift Package ohne Xcode-Projekt. Das Bundle baut `Scripts/build_local_app.sh`.
 | | `GoalsMenu.swift`, `SettingsView.swift`, `AppDelegate.swift` | Menü, Einstellungsfenster, App |
 | | `SelfTest.swift`, `Snapshot.swift` | Prüf-Startmodi |
 
+## Bauen
+
+`Scripts/build_local_app.sh` arbeitet in fünf Schritten:
+
+1. `swift build -c release` baut das Programm.
+2. `Scripts/generate_icon.swift` erzeugt das Symbol, aber nur wenn `build/AppIcon.icns` fehlt.
+3. Das Skript legt das Bundle unter `build/Goals.app` an und schreibt die `Info.plist`.
+4. `codesign --sign -` signiert ad hoc.
+5. Das Skript beendet die laufende App, ersetzt `/Applications/Goals.app` per `rsync`, signiert erneut und startet sie.
+
+`goals.json` und die Einstellungen bleiben dabei unberührt. Version und Bundle-ID stehen oben im Skript.
+
+## Einstellungen
+
+Die Einstellungen liegen in den UserDefaults von `com.joemartinbtc.Goals`, die Karten nur in `goals.json`.
+
+| Schlüssel | Werte | Ab Werk |
+|---|---|---|
+| `size` | `small`, `medium`, `large`, `xlarge` | `medium` |
+| `displaySeconds` | 5, 10, 15, 30 | 15 |
+| `intervalMinutes` | 1 bis 1440 | 60 |
+| `jitter` | wahr oder falsch | falsch |
+| `colorMode` | `mono`, `color` | `mono` |
+| `scheme` | `metall`, `signal`, `pastell`, `nacht`, `eigene` | `metall` |
+| `positionX`, `positionY` | Versatz gegen die Mitte des Hauptbildschirms | 0 |
+| `autostartInitialized` | merkt sich den einmaligen Eintrag als Anmeldeobjekt | fehlt |
+
 ## Entscheidungen
 
 - **Fenster:** `NSPanel` mit `.nonactivatingPanel`, `canBecomeKey == false`, Ebene `.statusBar`, `collectionBehavior` mit `.canJoinAllSpaces` und `.fullScreenAuxiliary`. So liegt es auch über Vollbild-Apps, obwohl Goals eine normale Dock-App ist.
@@ -35,6 +62,29 @@ Swift Package ohne Xcode-Projekt. Das Bundle baut `Scripts/build_local_app.sh`.
 - `--autostart-status`: nennt den Stand des Anmeldeobjekts.
 - `--snapshot <ordner>`: 24 Bilder der Karten (vier Größen, sechs Farbdarstellungen) und zwei des Einstellungsfensters. Die Karten rendert `ImageRenderer`, das Fenster `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
 - `--show-for <sekunden> [--allow-capture]`: zeigt zwei Prüfkarten und nennt ihr Rechteck. So lässt sich die Aufzeichnungs-Sperre von außen prüfen.
+
+## Was geprüft wird
+
+`swift test` führt die Tests von `GoalsCore` aus: 71 Tests in den Gruppen Ablage, Einstellungen, Farben, Raster, Takt und Zeitangaben. Sie brauchen keinen Bildschirm.
+
+`--selftest` endet mit Exit 0, wenn alles grün ist, mit 1 bei einem Fehler und mit 2 bei gesperrtem Bildschirm. Fehlt eine Prüfung im Ergebnis, zählt sie als gescheitert. Das sind die 29 Prüfungen:
+
+| Bereich | Prüfungen |
+|---|---|
+| Takt und Anzeigedauer | `notBeforeInterval`, `appearsAfterInterval`, `allCardsTogether`, `vanishesAfterDisplay`, `nextCountsFromVanish` |
+| Fenster | `listedOnCurrentSpace`, `visibleWhenShown`, `layerAboveFloating`, `sharingFlagNone`, `panelFlags`, `centeredOnMainScreen`, `statusSymbolExists`, `frontmostUnchanged` |
+| Klicks | `closeOneByClick`, `noReflowAfterClose`, `closeAllByClick` |
+| Größen | `singleCardAlone`, `fourWidths` |
+| Position | `positionRestored`, `positionResetCenters` |
+| Sperre | `sessionLockReadable`, `noTimerWhileLocked`, `lockedShowsNothing`, `unlockShowsOverdue` |
+| Datei | `externalReplace`, `externalInPlace`, `brokenFileUntouched`, `brokenFileRecovers`, `realFileUntouched` |
+
+Diese vier Punkte prüft nur ein Mensch:
+
+- Der Klick auf X und „Alle schließen“ mit der echten Maus.
+- Das Weitertippen in einem Programm, während die Karten erscheinen.
+- Eine echte Bildschirmaufnahme, denn `sharingFlagNone` prüft nur die Markierung des Fensters.
+- Eine echte Sperre des Bildschirms, denn der Selbsttest ruft die Sperre direkt auf.
 
 ## Fallen
 

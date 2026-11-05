@@ -2,7 +2,7 @@ import AppKit
 import GoalsCore
 
 /// `Goals --selftest`: prüft den echten Ablauf im echten Fenster, mit kurzen Zeiten und einer Wegwerf-Datei.
-/// Die Karten erscheinen dabei rund 15 Sekunden lang mehrfach auf dem Bildschirm.
+/// Die Karten erscheinen dabei rund 10 Sekunden lang mehrfach auf dem Bildschirm.
 @MainActor
 enum SelfTest {
     /// Jede Prüfung muss laufen. Fehlt eine im Ergebnis, zählt sie als gescheitert.

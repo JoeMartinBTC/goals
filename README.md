@@ -24,6 +24,8 @@ Native macOS-App, die deine Ziele in einem einstellbaren Takt als Karten über a
 
 Das Symbol in der Menüleiste, das Dock-Symbol und der Rechtsklick auf eine Karte öffnen dasselbe Menü: Jetzt zeigen, Karten, Größe, Anzeigedauer, Takt, Farbe, Position zurücksetzen, Einstellungen, Autostart, Beenden. Ein Klick auf das Dock-Symbol öffnet die Einstellungen.
 
+Ab Werk gilt: Größe „Mittel“ (480 pt), 15 Sekunden Anzeigedauer, Takt 1 Stunde ohne Streuung, einfarbig. Ein eigener Takt darf zwischen 1 Minute und 24 Stunden liegen.
+
 ## Die Datei
 
 Die Karten liegen lesbar in `~/Library/Application Support/Goals/goals.json`. Änderungen von außen wirken sofort, auch von Editoren, die atomar speichern. Treffen sie auf eine ungespeicherte Eingabe in der App, gewinnt die Datei. Eine Datei, die nicht lesbar ist, bleibt unangetastet: Die App meldet das und speichert nichts, bis sie wieder lesbar ist. Löschst du sie, schreibt die App den letzten guten Stand zurück.
@@ -58,7 +60,17 @@ swift test
 /Applications/Goals.app/Contents/MacOS/Goals --snapshot /tmp/goals-bilder
 ```
 
-`--selftest` läuft rund 15 Sekunden im echten Fenster mit einer Wegwerf-Datei und gibt JSON aus. Aufbau und Fallen: [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md).
+`--selftest` läuft rund 10 Sekunden im echten Fenster mit einer Wegwerf-Datei und gibt JSON aus. Aufbau, alle Prüfungen und Fallen: [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md). Der Stand je Version steht in [CHANGELOG.md](CHANGELOG.md).
+
+## Entfernen
+
+Schalte zuerst im Menü den Autostart aus und beende die App. Danach entfernen diese Befehle die App, deine Karten und die Einstellungen:
+
+```bash
+rm -rf /Applications/Goals.app
+rm -rf ~/Library/Application\ Support/Goals
+defaults delete com.joemartinbtc.Goals
+```
 
 ## Lizenz
 
