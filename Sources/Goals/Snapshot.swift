@@ -27,13 +27,46 @@ enum Snapshot {
                  detail: "Beispieltext: Welche Zahl am Monatsende stimmen soll."),
     ]
 
+    /// Für die Projektseite: sechs Ziele von groß bis klein.
+    private static let siteCards: [String: [GoalCard]] = [
+        "de": [
+            GoalCard(id: "a", title: "Lebenswerk", subtitle: "Etwas bauen, das bleibt",
+                     detail: "Ein Werk, das in 30 Jahren noch jemandem hilft."),
+            GoalCard(id: "b", title: "Freiheit", subtitle: "Mit 55 frei entscheiden",
+                     detail: "Jeden Monat geht zuerst ein fester Betrag zur Seite, der Rest danach."),
+            GoalCard(id: "c", title: "Gesundheit", subtitle: "Mit 80 noch die Treppe hoch",
+                     detail: "Dafür jeden Tag 30 Minuten raus, auch bei Regen."),
+            GoalCard(id: "d", title: "Lernen", subtitle: "Bis zum Sommer Spanisch sprechen",
+                     detail: "Zwanzig Minuten am Tag, bis ein Gespräch ohne Übersetzer klappt."),
+            GoalCard(id: "e", title: "Familie", subtitle: "Sonntags essen ohne Handy",
+                     detail: "Alle sitzen am Tisch, und das Telefon bleibt in der Küche."),
+            GoalCard(id: "f", title: "Freunde", subtitle: "Einen alten Freund anrufen",
+                     detail: "Zehn Minuten reichen. Nicht erst, wenn mal Zeit ist."),
+        ],
+        "en": [
+            GoalCard(id: "a", title: "Life’s work", subtitle: "Build something that lasts",
+                     detail: "A piece of work that still helps someone in 30 years."),
+            GoalCard(id: "b", title: "Freedom", subtitle: "Free to choose at 55",
+                     detail: "Each month a fixed amount goes aside first, then the rest."),
+            GoalCard(id: "c", title: "Health", subtitle: "Still taking the stairs at 80",
+                     detail: "So 30 minutes outside every day, even in the rain."),
+            GoalCard(id: "d", title: "Learning", subtitle: "Speak Spanish by summer",
+                     detail: "Twenty minutes a day, until a conversation works without a translator."),
+            GoalCard(id: "e", title: "Family", subtitle: "Sunday dinner without phones",
+                     detail: "Everyone sits at the table, and the phone stays in the kitchen."),
+            GoalCard(id: "f", title: "Friends", subtitle: "Call an old friend",
+                     detail: "Ten minutes is enough. Don’t wait until there’s time."),
+        ],
+    ]
+
     private static func write(_ image: NSImage?, _ url: URL) -> Bool {
         guard let tiff = image?.tiffRepresentation,
               let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) else { return false }
         return (try? png.write(to: url)) != nil
     }
 
-    private static func overlayModel(cards: [GoalCard], size: CardSize, mode: ColorMode, scheme: ColorSchemeKind) -> OverlayModel {
+    private static func overlayModel(cards: [GoalCard], size: CardSize, mode: ColorMode, scheme: ColorSchemeKind,
+                                     available: CGSize = CGSize(width: 3200, height: 1800)) -> OverlayModel {
         let model = OverlayModel()
         var entries: [String: OverlayModel.Entry] = [:]
         for (index, card) in cards.enumerated() {
@@ -42,7 +75,7 @@ enum Snapshot {
         model.entries = entries
         model.visible = Set(cards.map(\.id))
         let byID = Dictionary(uniqueKeysWithValues: cards.map { ($0.id, $0) })
-        model.layout = CardLayout.fit(ids: cards.map(\.id), preferred: size, available: CGSize(width: 3200, height: 1800)) { id, s in
+        model.layout = CardLayout.fit(ids: cards.map(\.id), preferred: size, available: available) { id, s in
             byID[id].map { CardMeasure.height(of: $0, size: s) } ?? 0
         }
         return model
@@ -52,6 +85,55 @@ enum Snapshot {
         let renderer = ImageRenderer(content: OverlayContentView(model: overlayModel(cards: demoCards, size: size, mode: mode, scheme: scheme)))
         renderer.scale = 1
         return renderer.nsImage
+    }
+
+    /// Durchsichtiger Hintergrund und doppelte Auflösung, damit die Karten direkt auf der Seite liegen.
+    private static func siteImage(cards: [GoalCard], columns: Int, mode: ColorMode, scheme: ColorSchemeKind) -> NSImage? {
+        let width = CGFloat(columns) * (CardSize.small.width + CardLayout.spacing) + 2 * CardLayout.margin
+        let model = overlayModel(cards: cards, size: .small, mode: mode, scheme: scheme, available: CGSize(width: width, height: 1800))
+        let renderer = ImageRenderer(content: OverlayContentView(model: model))
+        renderer.scale = 2
+        return renderer.nsImage
+    }
+
+    /// Bilder der Projektseite: Karten je Sprache, das Einstellungsfenster hell und dunkel.
+    private static func writeSiteImages(to directory: URL) -> Bool {
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        var ok = true
+        for (language, cards) in siteCards {
+            for scheme in [ColorSchemeKind.polarlicht, .morgenrot] {
+                ok = write(siteImage(cards: cards, columns: 3, mode: .color, scheme: scheme),
+                           directory.appendingPathComponent("hero-\(scheme.rawValue)-\(language).png")) && ok
+            }
+            for scheme in [ColorSchemeKind.fest, .abendrot, .polarlicht, .morgenrot] {
+                ok = write(siteImage(cards: cards, columns: 2, mode: .color, scheme: scheme),
+                           directory.appendingPathComponent("karten-\(scheme.rawValue)-\(language).png")) && ok
+            }
+            ok = write(siteImage(cards: cards, columns: 2, mode: .mono, scheme: .metall),
+                       directory.appendingPathComponent("karten-einfarbig-\(language).png")) && ok
+        }
+
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("goals-snapshot-\(UUID().uuidString)")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("goals.json")
+        if let data = try? JSONEncoder().encode(GoalFile(cards: siteCards["de"] ?? [])) { try? data.write(to: url) }
+        let suite = "goals-snapshot-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defaults.removePersistentDomain(forName: suite)
+        defer { defaults.removePersistentDomain(forName: suite) }
+
+        let store = GoalStore(fileURL: url)
+        store.load()
+        let engine = GoalsEngine(store: store, settings: GoalSettings(defaults: defaults))
+        engine.start()   // damit die Statuszeile die nächste Erinnerung nennt
+        defer { store.stop() }
+        for (name, appearance) in [("hell", NSAppearance.Name.aqua), ("dunkel", NSAppearance.Name.darkAqua)] {
+            ok = write(settingsImage(tab: .cards, store: store, settings: engine.settings, engine: engine,
+                                     appearance: NSAppearance(named: appearance), scale: 2),
+                       directory.appendingPathComponent("einstellungen-\(name).png")) && ok
+        }
+        return ok
     }
 
     /// Übersicht für die Doku: je Schema alle Verläufe, in zwei Spalten.
@@ -81,12 +163,14 @@ enum Snapshot {
     }
 
     /// Einstellungsfenster über `cacheDisplay`, denn `ImageRenderer` zeichnet keine nativen Bedienelemente.
-    private static func settingsImage(tab: SettingsNavigation.Tab, store: GoalStore, settings: GoalSettings, engine: GoalsEngine) -> NSImage? {
+    private static func settingsImage(tab: SettingsNavigation.Tab, store: GoalStore, settings: GoalSettings, engine: GoalsEngine,
+                                      appearance: NSAppearance? = nil, scale: Int? = nil) -> NSImage? {
         let navigation = SettingsNavigation()
         navigation.tab = tab
         let size = NSSize(width: 880, height: 680)
         let window = NSWindow(contentRect: NSRect(origin: NSPoint(x: -3000, y: -3000), size: size), styleMask: [.titled],
                               backing: .buffered, defer: false)
+        window.appearance = appearance
         let host = NSHostingView(rootView: SettingsRootView(store: store, settings: settings, engine: engine,
                                                             autoStart: AutoStart(), navigation: navigation))
         host.frame = NSRect(origin: .zero, size: size)
@@ -94,7 +178,11 @@ enum Snapshot {
         window.orderBack(nil)
         RunLoop.main.run(until: Date().addingTimeInterval(1))
         host.layoutSubtreeIfNeeded()
-        guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return nil }
+        let scaled = scale.flatMap { NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(size.width) * $0, pixelsHigh: Int(size.height) * $0,
+                                                      bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                                      colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) }
+        scaled?.size = size
+        guard let rep = scaled ?? host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return nil }
         host.cacheDisplay(in: host.bounds, to: rep)
         window.orderOut(nil)
         let image = NSImage(size: size)
@@ -139,6 +227,7 @@ enum Snapshot {
                    directory.appendingPathComponent("einstellungen.png")) && ok
         ok = write(settingsImage(tab: .display, store: store, settings: settings, engine: engine),
                    directory.appendingPathComponent("einstellungen-anzeige.png")) && ok
+        ok = writeSiteImages(to: directory.appendingPathComponent("seite")) && ok
         print(ok ? directory.path : "Snapshot fehlgeschlagen")
         return ok ? 0 : 1
     }

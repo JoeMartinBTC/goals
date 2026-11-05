@@ -4,6 +4,7 @@
 
 - Neuer Takt „1 Min.“ im Menü und im Einstellungsfenster, damit sich die Wiederholung schnell prüfen lässt.
 - Tests und `--selftest` prüfen jetzt auch, dass der Takt über mehrere Runden weiterläuft (`secondRoundAppears`).
+- `--snapshot` schreibt zusätzlich die Bilder der Projektseite nach `seite/`.
 
 ## 1.1.0 (2026-11-05)
 
