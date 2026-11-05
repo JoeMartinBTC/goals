@@ -1,6 +1,6 @@
 # Goals — Projektfakten
 
-Native macOS-App: Goal-Karten erscheinen im eingestellten Takt als Overlay über allem, ohne dem aktiven Programm den Fokus zu nehmen. Swift Package ohne Xcode-Projekt, MIT-Lizenz, Repo `JoeMartinBTC/goals` auf GitHub (privat).
+Native macOS-App: Goal-Karten erscheinen im eingestellten Takt als Overlay über allem, ohne dem aktiven Programm den Fokus zu nehmen. Swift Package ohne Xcode-Projekt, MIT-Lizenz, Repo `JoeMartinBTC/goals` auf GitHub (öffentlich seit 2026-11-05). Projektseite: <https://librarycompass.com/goals/>, Quelle im Repo LibraryCompass unter `web/goals/`, Bilder aus `--snapshot` (Ordner `seite/`).
 
 Die Hausregeln stehen in `~/.claude/CLAUDE.md` und gelten hier unverändert. Diese Datei nennt nur, was für dieses Projekt gilt.
 
@@ -9,7 +9,7 @@ Die Hausregeln stehen in `~/.claude/CLAUDE.md` und gelten hier unverändert. Die
 1. **Nur Apple-Frameworks.** `Package.swift` hat keine fremde Abhängigkeit.
 2. **Echte Karten nie anfassen.** `~/Library/Application Support/Goals/goals.json` und die UserDefaults von `com.joemartinbtc.Goals` sind Betriebsdaten. Tests, `--selftest` und `--snapshot` arbeiten mit Wegwerf-Dateien.
 3. **Kein Klarname im Repo.** Lokale Pfade gehören deshalb nicht in Dateien des Repos. Die Probe steht im Vertrag, den die Brain-Notiz verlinkt, und nicht hier, denn sie enthält die Namen.
-4. **Öffentlich wird das Repo nur auf Joes Entscheidung.** Der Befehl steht in der Brain-Notiz.
+4. **Das Repo ist öffentlich.** Jeder Push ist sofort sichtbar, die Klarnamen-Probe läuft deshalb vor dem Push.
 
 ## Wo was liegt
 

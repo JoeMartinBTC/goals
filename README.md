@@ -2,6 +2,8 @@
 
 Native macOS-App, die deine Ziele in einem einstellbaren Takt als Karten über alles legt, was gerade auf dem Bildschirm läuft. Sie bleiben ein paar Sekunden stehen und verschwinden wieder von selbst. Dein aktives Programm behält dabei den Fokus, du kannst einfach weitertippen.
 
+Projektseite: <https://librarycompass.com/goals/>
+
 ![Drei Karten in der einfarbigen Darstellung](docs/karten-einfarbig.png)
 
 ![Drei Karten im Schema Fest, jede mit eigenem Verlauf](docs/karten-farbig.png)
